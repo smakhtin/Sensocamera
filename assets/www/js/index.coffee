@@ -1,12 +1,14 @@
-app = {
+@app = {
 	initialize: () ->
-		this.bindEvents();
+		this.bindEvents()
 
 	bindEvents: ()->
 		document.addEventListener 'deviceready', this.onDeviceReady, false
 
 	onDeviceReady: () ->
         app.receivedEvent 'deviceready'
+        console.log "Trying to start my application"
+        mainloop = new window.App.MainLoop()
 
     receivedEvent: (id) ->
         parentElement = document.getElementById id
@@ -18,3 +20,4 @@ app = {
 
         console.log 'Received Event: ' + id
 }
+
