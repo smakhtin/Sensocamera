@@ -4,23 +4,18 @@
   window.App = {};
 
   window.App.MainLoop = (function() {
-    var update;
 
     function MainLoop(name) {
       this.name = name;
       console.log("Main Loop Started");
-      setTimeout(update, 1000 / 1);
-    }
-
-    update = function() {
-      console.log("Entered Frame");
-      navigator.accelerometer.getCurrentAcceleration(function(acceleration) {
+      navigator.accelerometer.watchAcceleration(function(acceleration) {
         return console.log(acceleration.x);
       }, function(error) {
         return console.log("Error: Can't access accelerometer");
+      }, {
+        frequency: 3000
       });
-      return setTimeout(update, 1000 / 1);
-    };
+    }
 
     return MainLoop;
 
