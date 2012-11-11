@@ -1,10 +1,17 @@
 window.App = {}
 class window.App.MainLoop
-	constructor: (@name) ->
-		console.log("Main Loop Started")
+	constructor: () ->
+		element = document.getElementById "accelerometerX"
+
 		navigator.accelerometer.watchAcceleration(
 			(acceleration) ->
-				console.log acceleration.x
+				element.innerHTML = "<p>#{acceleration.x}</p>"
 			, (error) ->
 				console.log "Error: Can't access accelerometer"
 			, {frequency:3000})
+
+		testPlugin = new window.App.TestPlugin()
+		testPlugin.callNativeFunction(
+			() -> console.log "Working Good",
+			() -> "Not Working", 
+			"Bla")

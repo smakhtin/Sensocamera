@@ -5,16 +5,22 @@
 
   window.App.MainLoop = (function() {
 
-    function MainLoop(name) {
-      this.name = name;
-      console.log("Main Loop Started");
+    function MainLoop() {
+      var element, testPlugin;
+      element = document.getElementById("accelerometerX");
       navigator.accelerometer.watchAcceleration(function(acceleration) {
-        return console.log(acceleration.x);
+        return element.innerHTML = "<p>" + acceleration.x + "</p>";
       }, function(error) {
         return console.log("Error: Can't access accelerometer");
       }, {
         frequency: 3000
       });
+      testPlugin = new window.App.TestPlugin();
+      testPlugin.callNativeFunction(function() {
+        return console.log("Working Good");
+      }, function() {
+        return "Not Working";
+      }, "Bla");
     }
 
     return MainLoop;
