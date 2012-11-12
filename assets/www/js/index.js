@@ -10,18 +10,8 @@
     },
     onDeviceReady: function() {
       var mainloop;
-      app.receivedEvent('deviceready');
       console.log("Trying to start my application");
       return mainloop = new window.App.MainLoop();
-    },
-    receivedEvent: function(id) {
-      var listeningElement, parentElement, receivedElement;
-      parentElement = document.getElementById(id);
-      listeningElement = parentElement.querySelector('.listening');
-      receivedElement = parentElement.querySelector('.received');
-      listeningElement.setAttribute('style', 'display:none;');
-      receivedElement.setAttribute('style', 'display:block;');
-      return console.log('Received Event: ' + id);
     }
   };
 

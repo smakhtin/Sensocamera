@@ -1,5 +1,5 @@
-window.App = {}
-class window.App.MainLoop
+@App = {}
+class @App.MainLoop
 	constructor: () ->
 		element = document.getElementById "accelerometerX"
 
