@@ -13,12 +13,43 @@
     <script src="libs/jquery.mobile-1.2.0.js"></script>
 </head>
 <body>
-    <div class="app">
-        <h1>Apache Cordova</h1>
-        <div id="accelerometerX">
+    <div data-role="page" id="record">
+        <div data-role="footer" data-id="mainHeader" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#record" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Record</a></li>
+                    <li><a href="#status" data-prefetch="true" data-transition="pop">Status</a></li>
+                    <li><a href="#settings" data-prefetch="true" data-transition="pop">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="status">
+        <div data-role="footer" data-id="mainHeader" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#record" data-prefetch="true" data-transition="pop">Record</a></li>
+                    <li><a href="#status" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Status</a></li>
+                    <li><a href="#settings" data-prefetch="true" data-transition="pop">Settings</a></li>
+                </ul>
+            </div>
+        </div>        
+        <div data-role="content" id="accelerometerX">
             <p>null</p>
         </div>
     </div>
+    <div data-role="page" id="settings">
+        <div data-role="footer" data-id="mainHeader" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#record" data-prefetch="true" data-transition="pop">Record</a></li>
+                    <li><a href="#status" data-prefetch="true" data-transition="pop">Status</a></li>
+                    <li><a href="#settings" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!--<script src="http://192.168.1.104:8080/target/target-script-min.js#smakhtin"></script>-->
     <script type="text/javascript" src="cordova-2.2.0.js"></script>
     <script type="text/javascript" src="js/mainloop.js"></script>

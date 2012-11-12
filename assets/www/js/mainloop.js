@@ -9,7 +9,7 @@
       var element, testPlugin;
       element = document.getElementById("accelerometerX");
       navigator.accelerometer.watchAcceleration(function(acceleration) {
-        return element.innerHTML = "<p>" + acceleration.x + "</p>";
+        return element.innerHTML = "<p>AccelerometerX : " + acceleration.x + "</p>";
       }, function(error) {
         return console.log("Error: Can't access accelerometer");
       }, {

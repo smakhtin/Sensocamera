@@ -5,7 +5,7 @@ class @App.MainLoop
 
 		navigator.accelerometer.watchAcceleration(
 			(acceleration) ->
-				element.innerHTML = "<p>#{acceleration.x}</p>"
+				element.innerHTML = "<p>AccelerometerX : #{acceleration.x}</p>"
 			, (error) ->
 				console.log "Error: Can't access accelerometer"
 			, {frequency:3000})
