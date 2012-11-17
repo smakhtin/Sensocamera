@@ -1,11 +1,10 @@
-@App = {}
-class @App.MainLoop
+class @Sensocamera.MainLoop
 	constructor: () ->
-		element = document.getElementById "accelerometerX"
+		element = $("#accelerometerX")[0]
 
 		navigator.accelerometer.watchAcceleration(
 			(acceleration) ->
-				element.innerHTML = "<p>AccelerometerX : #{acceleration.x}</p>"
+				element.innerHTML = acceleration.x
 			, (error) ->
 				console.log "Error: Can't access accelerometer"
 			, {frequency:3000})

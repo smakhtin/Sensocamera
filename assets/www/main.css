@@ -1,0 +1,21 @@
+.recordButton {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-top: -64px;
+	margin-left: -64px;
+	/*-webkit-appearance: none;*/
+	border: 0;
+}
+
+.horizontalObject, .sensorLabel {
+	float: left;
+	text-align:left;
+	position:relative;
+}
+
+.sensorLabel {
+	color:#878787;
+	padding-left: 5px;
+	padding-right: 5px;
+}

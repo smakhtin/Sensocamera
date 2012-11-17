@@ -1,4 +1,4 @@
 Sensocamera
 ===========
 
-Makes Cosm compatible sensorbox from Android 
+Cosm compatible sensorbox for Android 
