@@ -1,4 +1,4 @@
-class window.App.TestPlugin
+class @Sensocamera.TestPlugin
 	constructor: () ->
 
 	callNativeFunction: (success, fail, param) ->

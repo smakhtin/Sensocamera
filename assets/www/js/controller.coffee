@@ -1,30 +1,74 @@
 class @Sensocamera.Controller
+	db = window.openDatabase("sensocameraDB", "1.0", "Sensocamera DB", 1000000);
+
 	recording = false;
-	datastreamValid = false;
-	datastreamID = "null";
+	feedValid = false;
+	feedID = "null";
 
 	PAUSE_IMAGE = "img/button-disabled.png"
 	START_IMAGE = "img/button-enabled.png"
 
-	constructor: () ->
-		recordButton = $("#recordButton")[0];
-		recordButton.onClick = record
+	checkStorage = () ->
+		db.transaction(
+			(tx) ->
+				tx.executeSql "SELECT * FROM SETTINGS"
+			, (error) ->
+				console.log error
+				db.transaction (tx) -> 
+					tx.executeSql "CREATE TABLE SETTINGS(id integer primary key, name text, value text)"
+					tx.executeSql "INSERT INTO SETTINGS(name, value) VALUES('feedID', '')"
+			, (success) ->
+				console.log "We already have table, congratulations"
+				checkPreferecnes()
+		)
 
-		syncButton = $("#syncButton")[0];
-		syncButton.onClick = sync
+	checkPreferecnes = () ->
+		result = null;
 
-		datastreamInput = $("#datastreamID")[0];
+		db.transaction(
+			(tx) ->
+				tx.executeSql(
+					"SELECT name, value FROM SETTINGS", []
+					, (tx, results) ->
+						console.log results
+					, (error) -> 
+						console.log "Looks like we have no preferences"
+				)
+			, (error) ->
+				console.log error
+			, (success) ->
+				console.log success
+		)
+	
+	prepareObjects = () ->
+		recordButton = $("#recordButton");
+		recordButton.click record
+		recordButton.addClass "startRecord"
+
+		syncButton = $("#syncButton");
+		syncButton.click sync
 		
-		datastreamInput.onBlur = () ->
-			id = datastreamInput.value
+		feedInput = $("#feedID");
+		feedInput.blur () ->
+			id = feedInput[0].value
 
-			if id != datastreamID
-				datastreamID = id;
-				checkDatastream datastreamInput.value;
+			if id != feedID
+				feedID = id;
+				checkFeed feedID;
+		
+		createFeedButton = $("#createFeedButton");
+		createFeedButton.click () ->
+			createFeed feedID;
 
-		createDatastreamButton = $("#createDatastreamButton")[0];
-		createDatastreamButton.onClick = () ->
-			createDatastream(datastreamID);
+		createFeedButton.button('disable')
+		createFeedButton.button('refresh')
+
+	constructor: () ->
+		checkStorage()
+		prepareObjects()
+
+		sensorManager = new window.Sensocamera.SensorManager()
+		console.log "Controller Initialiased"
 
 	setState = (targetState) ->
 		state = window.Sensocamera.State;
@@ -37,21 +81,50 @@ class @Sensocamera.Controller
 				console.log targetState + "State"
 
 	record = () ->
-		if recording 
-			recordButton.setAttribute("src", START_IMAGE)
+		console.log "Record Pressed"
+		recordButton = $("#recordButton");
+		if recording
+			recordButton.removeClass "stopRecord"
+			recordButton.addClass "startRecord"
+			
 			recording = false;
+			console.log "Stop Recording"
 		else
-			recordButton.setAttribute("src", PAUSE_IMAGE)
+			recordButton.removeClass "startRecord"
+			recordButton.addClass "stopRecord"
+
 			recording = true;
+			console.log "Start Recording"
 
 	sync = () ->
 		console.log "Syncing With Server"
 
-	checkDatastream = (streamName) ->
-		console.log "Checking Datastream " + streamName
+	checkFeed = (value) ->
+		console.log "Checking feed " + value
 
-	createDatastream = (streamName) ->
-		console.log "Creating Datastream" + streamName
+		cosm.feed.get value, (data) ->
+			console.log "Request Satus " + data.status
+			if data.status == 404
+				console.log "Trying to enable button"
+
+				createFeedButton = $("#createFeedButton");
+				createFeedButton.button('enable')
+				createFeedButton.button('refresh')
+			else
+				db.transaction (tx) -> tx.executeSql "UPDATE SETTINGS SET value='#{value}' WHERE name='feedID'"
+
+	createFeed = (value) ->
+		console.log "Creating feed " + value
+
+		testObject =
+  			title: "Sensocamera Alpha Test",
+  			version: "1.0.0",
+  			datastreams:[{"id":"0"},{"id":"1"}]
+
+		cosm.feed.new(testObject, 
+			(data) -> 
+				console.log data
+		)
 
 @Sensocamera.State = 
 	RECORD: "record"

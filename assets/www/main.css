@@ -4,11 +4,21 @@
 	left: 50%;
 	margin-top: -64px;
 	margin-left: -64px;
+	width: 128px;
+	height: 128px;
 	/*-webkit-appearance: none;*/
 	border: 0;
 }
 
-.horizontalObject, .sensorLabel {
+.startRecord {
+	background:url(img/button-start.png) no-repeat;
+}
+
+.stopRecord {
+	background:url(img/button-stop.png) no-repeat;
+}
+
+.horizontalObject, .sensorLabel, .sensorValue {
 	float: left;
 	text-align:left;
 	position:relative;
@@ -18,4 +28,8 @@
 	color:#878787;
 	padding-left: 5px;
 	padding-right: 5px;
+}
+
+.sensorValue {
+	
 }

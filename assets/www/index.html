@@ -4,33 +4,36 @@
 	<title>Sensocamera</title>
 
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="format-detection" content="telephone=no" />
-	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	<!-- <meta name="format-detection" content="telephone=no" /> -->
+	<!--<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />-->
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 
 	<link rel="stylesheet" href="libs/jquery.mobile-1.2.0.css" />
 	<link rel="stylesheet" href="main.css" />
 
-	<script data-main="js/main" src="libs/require.js"></script>
-
 	<!-- Libs -->
-	<!--<script src="libs/jquery-1.8.2.js"></script>
+	<script src="libs/jquery-1.8.2.js"></script>
 	<script src="libs/jquery.mobile-1.2.0.js"></script>
 
-	<script type="text/javascript" src="cordova-2.2.0.js"></script>-->
+	<script type="text/javascript" src="cordova-2.2.0.js"></script>
+
+	<script type="text/javascript" src="libs/cosmjs-1.0.0.js"></script>
 
 	<!-- Remote Debug -->
 	<!--<script src="http://192.168.1.104:8080/target/target-script-min.js#smakhtin"></script>-->
 
 	<!-- Source code -->
-	<!--<script type="text/javascript" src="js/mainloop.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="js/sensorManager.js"></script>
 	<script type="text/javascript" src="js/testPlugin.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
-	<script type="text/javascript">this.app.initialize();</script>-->
+	<script type="text/javascript" src="js/controller.js"></script>
+	<script type="text/javascript" src="js/cosmObjects.js"></script>
+	<script type="text/javascript">this.Sensocamera.main.initialize();</script>
 
 </head>
 <body>
 	<div data-role="page" id="record">
-		<button class="recordButton" id="recordButton" data-role="none"><img src="img/button-disabled.png"/></button>
+		<button class="recordButton" id="recordButton" data-role="none">Record</button>
 		<button id="syncButton">Sync</button>
 		<div data-role="footer" data-id="mainHeader" data-position="fixed">
 			<div data-role="navbar">
@@ -63,8 +66,8 @@
 	</div>
 	<div data-role="page" id="settings">
 		<fieldset>
-			<input id="datastreamID" type="text" name="datastreamID" placeholder="Datastream ID">
-			<button id="createDatastreamButton" data-inline="true" disabled = "disabled">Create</button>
+			<input id="feedID" type="text" name="feedID" placeholder="Feed ID">
+			<button id="createFeedButton" data-inline="true">Create</button>
 		</fieldset>
 		<div data-role="footer" data-id="mainHeader" data-position="fixed">
 			<div data-role="navbar">

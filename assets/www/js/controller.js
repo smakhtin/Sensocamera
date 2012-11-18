@@ -2,37 +2,81 @@
 (function() {
 
   this.Sensocamera.Controller = (function() {
-    var PAUSE_IMAGE, START_IMAGE, checkDatastream, createDatastream, datastreamID, datastreamValid, record, recording, setState, sync;
+    var PAUSE_IMAGE, START_IMAGE, checkFeed, checkPreferecnes, checkStorage, createFeed, db, feedID, feedValid, prepareObjects, record, recording, setState, sync;
+
+    db = window.openDatabase("sensocameraDB", "1.0", "Sensocamera DB", 1000000);
 
     recording = false;
 
-    datastreamValid = false;
+    feedValid = false;
 
-    datastreamID = "null";
+    feedID = "null";
 
     PAUSE_IMAGE = "img/button-disabled.png";
 
     START_IMAGE = "img/button-enabled.png";
 
-    function Controller() {
-      var createDatastreamButton, datastreamInput, recordButton, syncButton;
-      recordButton = $("#recordButton")[0];
-      recordButton.onClick = record;
-      syncButton = $("#syncButton")[0];
-      syncButton.onClick = sync;
-      datastreamInput = $("#datastreamID")[0];
-      datastreamInput.onBlur = function() {
+    checkStorage = function() {
+      return db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM SETTINGS");
+      }, function(error) {
+        console.log(error);
+        return db.transaction(function(tx) {
+          tx.executeSql("CREATE TABLE SETTINGS(id integer primary key, name text, value text)");
+          return tx.executeSql("INSERT INTO SETTINGS(name, value) VALUES('feedID', '')");
+        });
+      }, function(success) {
+        console.log("We already have table, congratulations");
+        return checkPreferecnes();
+      });
+    };
+
+    checkPreferecnes = function() {
+      var result;
+      result = null;
+      return db.transaction(function(tx) {
+        return tx.executeSql("SELECT name, value FROM SETTINGS", [], function(tx, results) {
+          return console.log(results);
+        }, function(error) {
+          return console.log("Looks like we have no preferences");
+        });
+      }, function(error) {
+        return console.log(error);
+      }, function(success) {
+        return console.log(success);
+      });
+    };
+
+    prepareObjects = function() {
+      var createFeedButton, feedInput, recordButton, syncButton;
+      recordButton = $("#recordButton");
+      recordButton.click(record);
+      recordButton.addClass("startRecord");
+      syncButton = $("#syncButton");
+      syncButton.click(sync);
+      feedInput = $("#feedID");
+      feedInput.blur(function() {
         var id;
-        id = datastreamInput.value;
-        if (id !== datastreamID) {
-          datastreamID = id;
-          return checkDatastream(datastreamInput.value);
+        id = feedInput[0].value;
+        if (id !== feedID) {
+          feedID = id;
+          return checkFeed(feedID);
         }
-      };
-      createDatastreamButton = $("#createDatastreamButton")[0];
-      createDatastreamButton.onClick = function() {
-        return createDatastream(datastreamID);
-      };
+      });
+      createFeedButton = $("#createFeedButton");
+      createFeedButton.click(function() {
+        return createFeed(feedID);
+      });
+      createFeedButton.button('disable');
+      return createFeedButton.button('refresh');
+    };
+
+    function Controller() {
+      var sensorManager;
+      checkStorage();
+      prepareObjects();
+      sensorManager = new window.Sensocamera.SensorManager();
+      console.log("Controller Initialiased");
     }
 
     setState = function(targetState) {
@@ -49,12 +93,19 @@
     };
 
     record = function() {
+      var recordButton;
+      console.log("Record Pressed");
+      recordButton = $("#recordButton");
       if (recording) {
-        recordButton.setAttribute("src", START_IMAGE);
-        return recording = false;
+        recordButton.removeClass("stopRecord");
+        recordButton.addClass("startRecord");
+        recording = false;
+        return console.log("Stop Recording");
       } else {
-        recordButton.setAttribute("src", PAUSE_IMAGE);
-        return recording = true;
+        recordButton.removeClass("startRecord");
+        recordButton.addClass("stopRecord");
+        recording = true;
+        return console.log("Start Recording");
       }
     };
 
@@ -62,12 +113,41 @@
       return console.log("Syncing With Server");
     };
 
-    checkDatastream = function(streamName) {
-      return console.log("Checking Datastream " + streamName);
+    checkFeed = function(value) {
+      console.log("Checking feed " + value);
+      return cosm.feed.get(value, function(data) {
+        var createFeedButton;
+        console.log("Request Satus " + data.status);
+        if (data.status === 404) {
+          console.log("Trying to enable button");
+          createFeedButton = $("#createFeedButton");
+          createFeedButton.button('enable');
+          return createFeedButton.button('refresh');
+        } else {
+          return db.transaction(function(tx) {
+            return tx.executeSql("UPDATE SETTINGS SET value='" + value + "' WHERE name='feedID'");
+          });
+        }
+      });
     };
 
-    createDatastream = function(streamName) {
-      return console.log("Creating Datastream" + streamName);
+    createFeed = function(value) {
+      var testObject;
+      console.log("Creating feed " + value);
+      testObject = {
+        title: "Sensocamera Alpha Test",
+        version: "1.0.0",
+        datastreams: [
+          {
+            "id": "0"
+          }, {
+            "id": "1"
+          }
+        ]
+      };
+      return cosm.feed["new"](testObject, function(data) {
+        return console.log(data);
+      });
     };
 
     return Controller;
