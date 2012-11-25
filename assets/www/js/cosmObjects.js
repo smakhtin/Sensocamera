@@ -3,6 +3,12 @@
 
   this.Sensocamera.CosmObjects = {};
 
+  this.Sensocamera.Sensors = {
+    ACCELEROMETER_X: "accelerometerX",
+    ACCELEROMETER_Y: "accelerometerY",
+    ACCELEROMETER_Z: "accelerometerZ"
+  };
+
   this.Sensocamera.CosmObjects.Feed = {
     title: "Sensocamera Stream",
     website: "http://mathrioshka.ru/sensocamera",
@@ -12,11 +18,11 @@
     },
     datastreams: [
       {
-        id: "accelerometerX"
+        id: window.Sensocamera.Sensors.ACCELEROMETER_X
       }, {
-        id: "accelerometerY"
+        id: window.Sensocamera.Sensors.ACCELEROMETER_Y
       }, {
-        id: "accelerometerZ"
+        id: window.Sensocamera.Sensors.ACCELEROMETER_Z
       }
     ]
   };

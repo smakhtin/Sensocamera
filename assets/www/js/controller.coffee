@@ -11,6 +11,9 @@ class @Sensocamera.Controller
 	feedInput = null
 	createFeedButton = null
 
+	allSensors = [];
+	sensorManager = null;
+
 	checkPreferencesTable = () ->
 		db.transaction(
 			(tx) ->
@@ -28,19 +31,10 @@ class @Sensocamera.Controller
 	checkPreferecnes = () ->
 		result = null;
 
-		db.transaction(
-			(tx) ->
-				tx.executeSql(
-					"SELECT name, value FROM SETTINGS", []
-					, (tx, results) ->
-						console.log results
-					, (error) -> 
-						console.log "Looks like we have no preferences"
-				)
-			, (error) ->
-				console.log error
-			, (success) ->
-				console.log success
+		db.transaction (tx) -> tx.executeSql("SELECT value FROM SETTINGS WHERE name='feedID'", [], 
+			(tx, sqlResult) ->
+				feedID = sqlResult.rows.item(0).value
+				feedInput.val(feedID);
 		)
 
 	prepareObjects = () ->
@@ -69,7 +63,7 @@ class @Sensocamera.Controller
 	listAvailableSensors = () ->
 		allDatastreams = window.Sensocamera.CosmObjects.Feed.datastreams
 
-		datastream.id.toUpperCase() for datastream in allDatastreams
+		datastream.id for datastream in allDatastreams
 
 	constructor: () ->
 		checkPreferencesTable()
@@ -96,17 +90,22 @@ class @Sensocamera.Controller
 			recordButton.removeClass "stopRecord"
 			recordButton.addClass "startRecord"
 			
+			sensorManager.stopRecord()
+
 			recording = false;
 			console.log "Stop Recording"
 		else
 			recordButton.removeClass "startRecord"
 			recordButton.addClass "stopRecord"
 
+			sensorManager.startRecord()
+
 			recording = true;
 			console.log "Start Recording"
 
 	sync = () ->
 		console.log "Syncing With Server"
+		sensorManager.syncSensor feedID, sensor for sensor in allSensors
 
 	checkFeed = (value) ->
 		console.log "Checking feed " + value
@@ -131,7 +130,7 @@ class @Sensocamera.Controller
   			version: "1.0.0",
   			datastreams:[{"id":"0"},{"id":"1"}]###
 
-		cosm.feed.new(testObject, 
+		cosm.feed.new(feed, 
 			(data) -> 
 				console.log data
 		)

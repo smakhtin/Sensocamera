@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.Controller = (function() {
-    var checkFeed, checkPreferecnes, checkPreferencesTable, createFeed, createFeedButton, db, feedID, feedInput, feedValid, listAvailableSensors, prepareObjects, record, recordButton, recording, setState, sync, syncButton;
+    var allSensors, checkFeed, checkPreferecnes, checkPreferencesTable, createFeed, createFeedButton, db, feedID, feedInput, feedValid, listAvailableSensors, prepareObjects, record, recordButton, recording, sensorManager, setState, sync, syncButton;
 
     db = window.openDatabase("sensocameraDB", "1.0", "Sensocamera DB", 1000000);
 
@@ -19,6 +19,10 @@
     feedInput = null;
 
     createFeedButton = null;
+
+    allSensors = [];
+
+    sensorManager = null;
 
     checkPreferencesTable = function() {
       return db.transaction(function(tx) {
@@ -39,15 +43,10 @@
       var result;
       result = null;
       return db.transaction(function(tx) {
-        return tx.executeSql("SELECT name, value FROM SETTINGS", [], function(tx, results) {
-          return console.log(results);
-        }, function(error) {
-          return console.log("Looks like we have no preferences");
+        return tx.executeSql("SELECT value FROM SETTINGS WHERE name='feedID'", [], function(tx, sqlResult) {
+          feedID = sqlResult.rows.item(0).value;
+          return feedInput.val(feedID);
         });
-      }, function(error) {
-        return console.log(error);
-      }, function(success) {
-        return console.log(success);
       });
     };
 
@@ -80,13 +79,12 @@
       _results = [];
       for (_i = 0, _len = allDatastreams.length; _i < _len; _i++) {
         datastream = allDatastreams[_i];
-        _results.push(datastream.id.toUpperCase());
+        _results.push(datastream.id);
       }
       return _results;
     };
 
     function Controller() {
-      var allSensors, sensorManager;
       checkPreferencesTable();
       prepareObjects();
       allSensors = listAvailableSensors();
@@ -112,18 +110,27 @@
       if (recording) {
         recordButton.removeClass("stopRecord");
         recordButton.addClass("startRecord");
+        sensorManager.stopRecord();
         recording = false;
         return console.log("Stop Recording");
       } else {
         recordButton.removeClass("startRecord");
         recordButton.addClass("stopRecord");
+        sensorManager.startRecord();
         recording = true;
         return console.log("Start Recording");
       }
     };
 
     sync = function() {
-      return console.log("Syncing With Server");
+      var sensor, _i, _len, _results;
+      console.log("Syncing With Server");
+      _results = [];
+      for (_i = 0, _len = allSensors.length; _i < _len; _i++) {
+        sensor = allSensors[_i];
+        _results.push(sensorManager.syncSensor(feedID, sensor));
+      }
+      return _results;
     };
 
     checkFeed = function(value) {
@@ -152,7 +159,7 @@
       			datastreams:[{"id":"0"},{"id":"1"}]
       */
 
-      return cosm.feed["new"](testObject, function(data) {
+      return cosm.feed["new"](feed, function(data) {
         return console.log(data);
       });
     };
