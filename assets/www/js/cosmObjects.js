@@ -3,36 +3,22 @@
 
   this.Sensocamera.CosmObjects = {};
 
-  this.Sensocamera.CosmObjects.Feed = (function() {
-
-    function Feed() {}
-
-    Feed.prototype.title = "Sensocamera Stream";
-
-    Feed.prototype.website = "http://mathrioshka.ru/sensocamera";
-
-    Feed.prototype.version = "1.0.0";
-
-    Feed.prototype.location = {
-      disposition: "mobile",
-      lat: 0,
-      lon: 0
-    };
-
-    Feed.prototype.datastreams = [
+  this.Sensocamera.CosmObjects.Feed = {
+    title: "Sensocamera Stream",
+    website: "http://mathrioshka.ru/sensocamera",
+    version: "1.0.0",
+    location: {
+      disposition: "mobile"
+    },
+    datastreams: [
       {
-        current_value: 0,
-        tags: ["humidity"],
-        id: 0
+        id: "accelerometerX"
       }, {
-        current_value: 0,
-        tags: ["humidity"],
-        id: 0
+        id: "accelerometerY"
+      }, {
+        id: "accelerometerZ"
       }
-    ];
-
-    return Feed;
-
-  })();
+    ]
+  };
 
 }).call(this);

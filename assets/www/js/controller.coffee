@@ -1,14 +1,17 @@
 class @Sensocamera.Controller
 	db = window.openDatabase("sensocameraDB", "1.0", "Sensocamera DB", 1000000);
 
-	recording = false;
-	feedValid = false;
-	feedID = "null";
+	recording = false
+	feedValid = false
+	feedID = "null"
 
-	PAUSE_IMAGE = "img/button-disabled.png"
-	START_IMAGE = "img/button-enabled.png"
+	#UI Elements
+	recordButton = null
+	syncButton = null
+	feedInput = null
+	createFeedButton = null
 
-	checkStorage = () ->
+	checkPreferencesTable = () ->
 		db.transaction(
 			(tx) ->
 				tx.executeSql "SELECT * FROM SETTINGS"
@@ -18,7 +21,7 @@ class @Sensocamera.Controller
 					tx.executeSql "CREATE TABLE SETTINGS(id integer primary key, name text, value text)"
 					tx.executeSql "INSERT INTO SETTINGS(name, value) VALUES('feedID', '')"
 			, (success) ->
-				console.log "We already have table, congratulations"
+				console.log "We already have PREFERENCES table, congratulations"
 				checkPreferecnes()
 		)
 
@@ -39,7 +42,7 @@ class @Sensocamera.Controller
 			, (success) ->
 				console.log success
 		)
-	
+
 	prepareObjects = () ->
 		recordButton = $("#recordButton");
 		recordButton.click record
@@ -63,11 +66,18 @@ class @Sensocamera.Controller
 		createFeedButton.button('disable')
 		createFeedButton.button('refresh')
 
+	listAvailableSensors = () ->
+		allDatastreams = window.Sensocamera.CosmObjects.Feed.datastreams
+
+		datastream.id.toUpperCase() for datastream in allDatastreams
+
 	constructor: () ->
-		checkStorage()
+		checkPreferencesTable()
 		prepareObjects()
 
-		sensorManager = new window.Sensocamera.SensorManager()
+		allSensors = listAvailableSensors()
+
+		sensorManager = new window.Sensocamera.SensorManager(db, allSensors)
 		console.log "Controller Initialiased"
 
 	setState = (targetState) ->
@@ -82,7 +92,6 @@ class @Sensocamera.Controller
 
 	record = () ->
 		console.log "Record Pressed"
-		recordButton = $("#recordButton");
 		if recording
 			recordButton.removeClass "stopRecord"
 			recordButton.addClass "startRecord"
@@ -107,7 +116,6 @@ class @Sensocamera.Controller
 			if data.status == 404
 				console.log "Trying to enable button"
 
-				createFeedButton = $("#createFeedButton");
 				createFeedButton.button('enable')
 				createFeedButton.button('refresh')
 			else
@@ -116,10 +124,12 @@ class @Sensocamera.Controller
 	createFeed = (value) ->
 		console.log "Creating feed " + value
 
-		testObject =
+		feed = $.extend({}, window.Sensocamera.CosmObjects.Feed)
+
+		###testObject =
   			title: "Sensocamera Alpha Test",
   			version: "1.0.0",
-  			datastreams:[{"id":"0"},{"id":"1"}]
+  			datastreams:[{"id":"0"},{"id":"1"}]###
 
 		cosm.feed.new(testObject, 
 			(data) -> 
