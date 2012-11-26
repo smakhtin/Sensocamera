@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Microbridge/Microbridge.iml" filepath="$PROJECT_DIR$/Microbridge/Microbridge.iml" />
       <module fileurl="file://$PROJECT_DIR$/Sensocamera.iml" filepath="$PROJECT_DIR$/Sensocamera.iml" />
     </modules>
   </component>
