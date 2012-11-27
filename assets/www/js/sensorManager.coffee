@@ -60,11 +60,14 @@ class @Sensocamera.SensorManager
 			, {frequency:3000})
 
 	setupArduino = () ->
-		testPlugin = new window.Sensocamera.TestPlugin()
+		###testPlugin = new window.Sensocamera.TestPlugin()
 		testPlugin.callNativeFunction(
 			() -> console.log "Working Good",
 			() -> "Not Working", 
-			"Bla")
+			"Bla")###
+
+		adk = new window.Sensocamera.ADKBridge()
+		adk.watchAcceleration(((success)-> console.log success), ((error)-> error), 3000)
 
 	constructor: (base, @sensors) ->
 		console.log "SensorManager Started"
@@ -76,6 +79,7 @@ class @Sensocamera.SensorManager
 		checkSensorTable sensorId for sensorId in sensors
 
 		setupAccelerometer()
+		setupArduino()
 
 		console.log "SensorManager Initialiased"
 

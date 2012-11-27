@@ -69,13 +69,20 @@
     };
 
     setupArduino = function() {
-      var testPlugin;
-      testPlugin = new window.Sensocamera.TestPlugin();
-      return testPlugin.callNativeFunction(function() {
-        return console.log("Working Good");
-      }, function() {
-        return "Not Working";
-      }, "Bla");
+      /*testPlugin = new window.Sensocamera.TestPlugin()
+      		testPlugin.callNativeFunction(
+      			() -> console.log "Working Good",
+      			() -> "Not Working", 
+      			"Bla")
+      */
+
+      var adk;
+      adk = new window.Sensocamera.ADKBridge();
+      return adk.watchAcceleration((function(success) {
+        return console.log(success);
+      }), (function(error) {
+        return error;
+      }), 3000);
     };
 
     function SensorManager(base, sensors) {
@@ -89,6 +96,7 @@
         checkSensorTable(sensorId);
       }
       setupAccelerometer();
+      setupArduino();
       console.log("SensorManager Initialiased");
     }
 
