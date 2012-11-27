@@ -16,6 +16,24 @@ import org.microbridge.server.ServerListener;
 import java.io.IOException;
 
 public class ADKBridge extends CordovaPlugin {
+    public static int GAS_SENSOR_ID = 1;
+    public static int TEMPERATURE_SENSOR_ID = 2;
+    public static int PRESSURE_SENSOR_ID = 3;
+    public static int HUMIDITY_SENSOR_ID = 4;
+    public static int LIGHT_SENSOR_ID = 5;
+
+    public static final String GAS = "gas";
+    public static final String TEMPERATURE = "temperature";
+    public static final String PRESSURE = "pressure";
+    public static final String HUMIDITY = "humidity";
+    public static final String LIGHT = "light";
+
+    private int gasValue = 0;
+    private int temperatureValue = 0;
+    private int pressureValue = 0;
+    private int humidityValue = 0;
+    private int lightValue = 0;
+
 	public static final String START = "start";
 	public static final String STOP = "stop";
 
@@ -102,7 +120,7 @@ public class ADKBridge extends CordovaPlugin {
 	{
 		try
 		{
-			server = new Server(4568); //Use the same port number used in ADK Main Board firmware
+			server = new Server(4568);
 			server.start();
 		}catch (IOException e)
 		{
@@ -116,6 +134,9 @@ public class ADKBridge extends CordovaPlugin {
 			{
 				if(currentState != STATE_RUNNING) return;
 
+                int id = (data[3] & 0xff);
+                int val = (data[0] & 0xff) | ((data[1] & 0xff) << 8) | ((data[2] & 0xff) << 160);
+
 				Log.d("STATUS", "Received some data");
 
 				win();
@@ -128,7 +149,7 @@ public class ADKBridge extends CordovaPlugin {
 	}
 
 	private void fail(int code, String message)
-	{
+    {
 		// Error object
 		JSONObject errorObj = new JSONObject();
 		try {
@@ -149,16 +170,18 @@ public class ADKBridge extends CordovaPlugin {
 		callbackContext.sendPluginResult(result);
 	}
 
-	private JSONObject getSensorsJSON() {
+	private JSONObject getSensorsJSON()
+    {
 		JSONObject r = new JSONObject();
-//		try {
-//			r.put("x", this.x);
-//			r.put("y", this.y);
-//			r.put("z", this.z);
-//			r.put("timestamp", this.timestamp);
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			r.put(GAS, gasValue);
+			r.put(TEMPERATURE, temperatureValue);
+			r.put(PRESSURE, pressureValue);
+			r.put(HUMIDITY, humidityValue);
+            r.put(LIGHT, lightValue);
+        } catch (JSONException e) {
+			e.printStackTrace();
+		}
 		return r;
 	}
 }
