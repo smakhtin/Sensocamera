@@ -14,13 +14,14 @@ import org.microbridge.server.Server;
 import org.microbridge.server.ServerListener;
 
 import java.io.IOException;
+import java.util.Timer;
 
 public class ADKBridge extends CordovaPlugin {
-    public static int GAS_SENSOR_ID = 1;
-    public static int TEMPERATURE_SENSOR_ID = 2;
-    public static int PRESSURE_SENSOR_ID = 3;
-    public static int HUMIDITY_SENSOR_ID = 4;
-    public static int LIGHT_SENSOR_ID = 5;
+    public static final int GAS_SENSOR_ID = 1;
+    public static final int TEMPERATURE_SENSOR_ID = 2;
+    public static final int PRESSURE_SENSOR_ID = 3;
+    public static final int HUMIDITY_SENSOR_ID = 4;
+    public static final int LIGHT_SENSOR_ID = 5;
 
     public static final String GAS = "gas";
     public static final String TEMPERATURE = "temperature";
@@ -48,6 +49,14 @@ public class ADKBridge extends CordovaPlugin {
 
 	Server server;
 	ServerListener listener;
+
+    Timer timer = new Timer();
+    MyTask myTask = new MyTask(this);
+
+    public ADKBridge()
+    {
+        //timer.schedule(myTask, 0, 1000);
+    }
 
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException
@@ -135,9 +144,26 @@ public class ADKBridge extends CordovaPlugin {
 				if(currentState != STATE_RUNNING) return;
 
                 int id = (data[3] & 0xff);
-                int val = (data[0] & 0xff) | ((data[1] & 0xff) << 8) | ((data[2] & 0xff) << 160);
+                int val = (data[0] & 0xff) | ((data[1] & 0xff) << 8) | ((data[2] & 0xff) << 16);
 
-				Log.d("STATUS", "Received some data");
+                switch (id)
+                {
+                    case GAS_SENSOR_ID:
+                        gasValue = val;
+                        break;
+                    case TEMPERATURE_SENSOR_ID:
+                        temperatureValue = val;
+                        break;
+                    case PRESSURE_SENSOR_ID:
+                        pressureValue = val;
+                        break;
+                    case HUMIDITY_SENSOR_ID:
+                        humidityValue = val;
+                        break;
+                    case LIGHT_SENSOR_ID:
+                        lightValue = val;
+                        break;
+                }
 
 				win();
 			}
@@ -163,7 +189,8 @@ public class ADKBridge extends CordovaPlugin {
 		callbackContext.sendPluginResult(err);
 	}
 
-	private void win() {
+	public void win() {
+        //gasValue +=1;
 		// Success return object
 		PluginResult result = new PluginResult(PluginResult.Status.OK, getSensorsJSON());
 		result.setKeepCallback(true);

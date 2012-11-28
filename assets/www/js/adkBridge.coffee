@@ -10,7 +10,7 @@ class @Sensocamera.ADKBridge
 	currentState = STATE_STOPPED
 
 	refreshPeriod = 0
-	timeoutAction = null
+	intervalAction = null
 
 	sensors = null;
 
@@ -20,15 +20,15 @@ class @Sensocamera.ADKBridge
 	watchAcceleration: (success, error, period)->
 		setState(STATE_STARTING)
 		refreshPeriod = period
-		timeoutAction = setTimeout (() -> success(sensors)), refreshPeriod
+		intervalAction = setInterval (() -> success(sensors)), refreshPeriod
 
 	callNativeFunction = (action, params) ->
 		cordova.exec(
 			(success)->
 				if currentState is STATE_STARTING
 					setState(STATE_RUNNING)
-					console.log success
-					sensors = success
+				console.log success
+				sensors = success
 			,(error)->
 				if currentState is STATE_STARTING
 					setState STATE_FAILED
@@ -44,7 +44,7 @@ class @Sensocamera.ADKBridge
 		switch currentState
 			when STATE_STOPPED
 				callNativeFunction(STOP_ACTION, [])
-				clearTimeout(timeoutAction)
+				clearInterval(intervalAction)
 			when STATE_STARTING
 				console.log "Starting ADK"
 				callNativeFunction(START_ACTION, [])

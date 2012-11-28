@@ -69,20 +69,23 @@
     };
 
     setupArduino = function() {
-      /*testPlugin = new window.Sensocamera.TestPlugin()
-      		testPlugin.callNativeFunction(
-      			() -> console.log "Working Good",
-      			() -> "Not Working", 
-      			"Bla")
-      */
-
-      var adk;
+      var adk, gasElement, humidityElement, lightElement, pressureElement, temperatureElement;
+      gasElement = $("#gas")[0];
+      temperatureElement = $("#temperature")[0];
+      pressureElement = $("#pressure")[0];
+      humidityElement = $("#humidity")[0];
+      lightElement = $("#light")[0];
       adk = new window.Sensocamera.ADKBridge();
-      return adk.watchAcceleration((function(success) {
-        return console.log(success);
-      }), (function(error) {
+      return adk.watchAcceleration(function(success) {
+        console.log("Updating sensor Values");
+        gasElement.innerHTML = success.gas;
+        temperatureElement.innerHTML = success.temperature;
+        pressureElement.innerHTML = success.pressure;
+        humidityElement.innerHTML = success.humidity;
+        return lightElement.innerHTML = success.light;
+      }, function(error) {
         return error;
-      }), 3000);
+      }, 3000);
     };
 
     function SensorManager(base, sensors) {

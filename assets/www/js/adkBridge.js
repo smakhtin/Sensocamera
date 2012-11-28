@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.ADKBridge = (function() {
-    var START_ACTION, STATE_FAILED, STATE_RUNNING, STATE_STARTING, STATE_STOPPED, STOP_ACTION, callNativeFunction, currentState, refreshPeriod, sensors, setState, timeoutAction;
+    var START_ACTION, STATE_FAILED, STATE_RUNNING, STATE_STARTING, STATE_STOPPED, STOP_ACTION, callNativeFunction, currentState, intervalAction, refreshPeriod, sensors, setState;
 
     START_ACTION = "start";
 
@@ -20,7 +20,7 @@
 
     refreshPeriod = 0;
 
-    timeoutAction = null;
+    intervalAction = null;
 
     sensors = null;
 
@@ -31,7 +31,7 @@
     ADKBridge.prototype.watchAcceleration = function(success, error, period) {
       setState(STATE_STARTING);
       refreshPeriod = period;
-      return timeoutAction = setTimeout((function() {
+      return intervalAction = setInterval((function() {
         return success(sensors);
       }), refreshPeriod);
     };
@@ -40,9 +40,9 @@
       return cordova.exec(function(success) {
         if (currentState === STATE_STARTING) {
           setState(STATE_RUNNING);
-          console.log(success);
-          return sensors = success;
         }
+        console.log(success);
+        return sensors = success;
       }, function(error) {
         if (currentState === STATE_STARTING) {
           setState(STATE_FAILED);
@@ -59,7 +59,7 @@
       switch (currentState) {
         case STATE_STOPPED:
           callNativeFunction(STOP_ACTION, []);
-          return clearTimeout(timeoutAction);
+          return clearInterval(intervalAction);
         case STATE_STARTING:
           console.log("Starting ADK");
           return callNativeFunction(START_ACTION, []);
