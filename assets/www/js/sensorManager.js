@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorTable, db, record, recordValue, sensorEnum, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation;
+    var checkSensorsTable, db, record, recordPeriod, recordValues, sensorEnum, sensorList, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation;
 
     sensors = [];
 
@@ -12,35 +12,47 @@
 
     record = false;
 
-    checkSensorTable = function(sensorId) {
-      sensorId = sensorId.toUpperCase();
+    recordPeriod = 3000;
+
+    sensorList = window.CosmObjects.Sensors;
+
+    sensorValues = {};
+
+    checkSensorsTable = function(sensorId) {
       return db.transaction(function(tx) {
-        return tx.executeSql("SELECT * FROM " + sensorId);
+        return tx.executeSql("SELECT * FROM SENSORS");
       }, function(error) {
         console.log(error);
         return db.transaction(function(tx) {
-          return tx.executeSql("CREATE TABLE " + sensorId + "(id integer primary key, at text, value text)");
+          return tx.executeSql("CREATE TABLE SENSORS(id integer primary key, name text, at text, value text)");
         });
       }, function(success) {
-        return console.log("We already have " + sensorId + " table, congratulations");
+        return console.log("We already have SENSORS table, congratulations");
       });
     };
 
-    recordValue = function(sensorId, sensorValue) {
-      var currentDate, timeStamp;
+    recordValues = function() {
+      var currentDate, sensorName, sensorValue, timeStamp, _results;
+      if (!record) {
+        return;
+      }
       currentDate = new Date();
       timeStamp = currentDate.toISOString();
-      sensorId = sensorId.toUpperCase();
-      return db.transaction(function(tx) {
-        var executionString;
-        executionString = "INSERT INTO " + sensorId + "(at, value) VALUES('" + timeStamp + "', '" + sensorValue + "')";
-        return tx.executeSql(executionString);
-      }, function(error) {
-        console.log(error);
-        return console.log("Can't record " + sensorId);
-      }, function(success) {
-        return console.log("" + sensorId + " data recorded");
-      });
+      _results = [];
+      for (sensorName in sensorValues) {
+        sensorValue = sensorValues[sensorName];
+        _results.push(db.transaction(function(tx) {
+          var executionString;
+          executionString = "INSERT INTO SENSORS(name, at, value) VALUES('" + sensorName + "', '" + timeStamp + "', '" + sensorValue + "')";
+          return tx.executeSql(executionString);
+        }, function(error) {
+          console.log(error);
+          return console.log("Can't record " + sensorId);
+        }, function(success) {
+          return console.log("" + sensorId + " data recorded");
+        }));
+      }
+      return _results;
     };
 
     setupAccelerometer = function() {
@@ -49,22 +61,16 @@
       elementY = $("#accelerometerY")[0];
       elementZ = $("#accelerometerZ")[0];
       return navigator.accelerometer.watchAcceleration(function(acceleration) {
-        var accelerationX, accelerationY, accelerationZ;
-        accelerationX = acceleration.x;
-        accelerationY = acceleration.y;
-        accelerationZ = acceleration.z;
-        if (record) {
-          recordValue(sensorEnum.ACCELEROMETER_X, accelerationX);
-          recordValue(sensorEnum.ACCELEROMETER_Y, accelerationY);
-          recordValue(sensorEnum.ACCELEROMETER_Z, accelerationZ);
-        }
+        sensorValues.accelerometerX = acceleration.x;
+        sensorValues.accelerometerY = acceleration.y;
+        sensorValues.accelerometerZ = acceleration.z;
         elementX.innerHTML = accelerationX;
         elementY.innerHTML = accelerationY;
         return elementZ.innerHTML = accelerationZ;
       }, function(error) {
         return console.log("Error: Can't access accelerometer");
       }, {
-        frequency: 3000
+        frequency: 1000
       });
     };
 
@@ -81,6 +87,12 @@
         if (success === null || success === void 0) {
           return;
         }
+        sensorValues.gas = success.gas;
+        sensorValues.temperature = success.temperature;
+        sensorValues.pressure = success.pressure;
+        sensorValues.humidity = success.humidity;
+        sensorValues.light = success.light;
+        sensorValues.sound = success.sound;
         gasElement.innerHTML = success.gas;
         temperatureElement.innerHTML = success.temperature;
         pressureElement.innerHTML = success.pressure;
@@ -88,21 +100,21 @@
         return lightElement.innerHTML = success.light;
       }, function(error) {
         return error;
-      }, 3000);
+      }, 1000);
     };
 
     setupCompass = function() {
       var compassElement;
       compassElement = $("#compass")[0];
-      return navigator.compass.watchHeading((function(compass) {
+      return navigator.compass.watchHeading(function(compass) {
         return compassElement.innerHTML = compass.magneticHeading;
-      }), function(error) {
-        return console.log(error, [
-          {
-            frequency: 3000
-          }
-        ]);
-      });
+      }, function(error) {
+        return console.log(error);
+      }, [
+        {
+          frequency: 1000
+        }
+      ]);
     };
 
     setupLocation = function() {
@@ -113,7 +125,9 @@
       headElement = $("#locationHead")[0];
       return navigator.geolocation.watchPosition(function(position) {
         console.log("Position Updated");
-        console.log(position);
+        sensorValues.locationLat = position.coords.latitude;
+        sensorValues.locationLong = position.coords.longitude;
+        sensorValues.locationAlt = position.coords.altitude;
         latElement.innerHTML = position.coords.latitude;
         longElement.innerHTML = position.coords.longitude;
         altElement.innerHTML = position.coords.altitude;
@@ -128,19 +142,21 @@
     };
 
     function SensorManager(base, sensors) {
-      var sensorId, _i, _len;
+      var id, _i, _len;
       this.sensors = sensors;
       console.log("SensorManager Started");
       sensorEnum = window.Sensocamera.Sensors;
       db = base;
+      checkSensorsTable();
       for (_i = 0, _len = sensors.length; _i < _len; _i++) {
-        sensorId = sensors[_i];
-        checkSensorTable(sensorId);
+        id = sensors[_i];
+        sensorValues[id] = 0;
       }
       setupAccelerometer();
       setupArduino();
       setupCompass();
       setupLocation();
+      setTimeout(record, recordPeriod);
       console.log("SensorManager Initialiased");
     }
 

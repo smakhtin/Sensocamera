@@ -153,12 +153,6 @@
       var feed;
       console.log("Creating feed " + value);
       feed = $.extend({}, window.Sensocamera.CosmObjects.Feed);
-      /*testObject =
-      			title: "Sensocamera Alpha Test",
-      			version: "1.0.0",
-      			datastreams:[{"id":"0"},{"id":"1"}]
-      */
-
       return cosm.feed["new"](feed, function(data) {
         return console.log(data);
       });

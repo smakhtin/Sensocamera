@@ -125,11 +125,6 @@ class @Sensocamera.Controller
 
 		feed = $.extend({}, window.Sensocamera.CosmObjects.Feed)
 
-		###testObject =
-  			title: "Sensocamera Alpha Test",
-  			version: "1.0.0",
-  			datastreams:[{"id":"0"},{"id":"1"}]###
-
 		cosm.feed.new(feed, 
 			(data) -> 
 				console.log data

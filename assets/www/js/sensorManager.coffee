@@ -1,40 +1,44 @@
 class @Sensocamera.SensorManager
 	sensors = []
 	sensorEnum = null
-	db = null;
+	db = null
 
-	record = false;
+	record = false
+	recordPeriod = 3000
 
-	checkSensorTable = (sensorId) ->
-		sensorId = sensorId.toUpperCase()
+	sensorList = window.CosmObjects.Sensors
 
+	sensorValues = {}
+
+	checkSensorsTable = (sensorId) ->
 		db.transaction(
 			(tx) ->
-				tx.executeSql "SELECT * FROM #{sensorId}"
+				tx.executeSql "SELECT * FROM SENSORS"
 			, (error) ->
 				console.log error
 				db.transaction (tx) -> 
-					tx.executeSql "CREATE TABLE #{sensorId}(id integer primary key, at text, value text)"
+					tx.executeSql "CREATE TABLE SENSORS(id integer primary key, name text, at text, value text)"
 			, (success) ->
-				console.log "We already have #{sensorId} table, congratulations"
+				console.log "We already have SENSORS table, congratulations"
 		)
 
-	recordValue = (sensorId, sensorValue) ->
+	recordValues = () ->
+		if not record then return
+		
 		currentDate = new Date()
 		timeStamp = currentDate.toISOString()
-		
-		sensorId = sensorId.toUpperCase()
-		
-		db.transaction(
-			(tx) -> 
-				executionString = "INSERT INTO #{sensorId}(at, value) VALUES('#{timeStamp}', '#{sensorValue}')"
-				tx.executeSql executionString
-			, (error) -> 
-				console.log error
-				console.log "Can't record #{sensorId}"
-			, (success) -> 
-				console.log "#{sensorId} data recorded"
-		)
+
+		for sensorName, sensorValue of sensorValues
+			db.transaction(
+				(tx) -> 
+					executionString = "INSERT INTO SENSORS(name, at, value) VALUES('#{sensorName}', '#{timeStamp}', '#{sensorValue}')"
+					tx.executeSql executionString
+				, (error) -> 
+					console.log error
+					console.log "Can't record #{sensorId}"
+				, (success) -> 
+					console.log "#{sensorId} data recorded"
+			)
 
 	setupAccelerometer = () ->
 		elementX = $("#accelerometerX")[0]
@@ -43,21 +47,16 @@ class @Sensocamera.SensorManager
 
 		navigator.accelerometer.watchAcceleration(
 			(acceleration) ->
-				accelerationX = acceleration.x
-				accelerationY = acceleration.y
-				accelerationZ = acceleration.z
-
-				if(record)
-					recordValue sensorEnum.ACCELEROMETER_X, accelerationX
-					recordValue sensorEnum.ACCELEROMETER_Y, accelerationY
-					recordValue sensorEnum.ACCELEROMETER_Z, accelerationZ
+				sensorValues.accelerometerX = acceleration.x
+				sensorValues.accelerometerY = acceleration.y
+				sensorValues.accelerometerZ = acceleration.z
 
 				elementX.innerHTML = accelerationX
 				elementY.innerHTML = accelerationY
 				elementZ.innerHTML = accelerationZ
 			, (error) ->
 				console.log "Error: Can't access accelerometer"
-			, {frequency:3000})
+			, {frequency:1000})
 
 	setupArduino = () ->
 		gasElement = $("#gas")[0]
@@ -71,6 +70,14 @@ class @Sensocamera.SensorManager
 			(success)-> 
 				console.log "Updating sensor Values"
 				if success is null or success is undefined then return
+
+				sensorValues.gas = success.gas
+				sensorValues.temperature = success.temperature
+				sensorValues.pressure = success.pressure
+				sensorValues.humidity = success.humidity
+				sensorValues.light = success.light
+				sensorValues.sound = success.sound
+
 				gasElement.innerHTML = success.gas
 				temperatureElement.innerHTML = success.temperature
 				pressureElement.innerHTML = success.pressure
@@ -78,11 +85,16 @@ class @Sensocamera.SensorManager
 				lightElement.innerHTML = success.light
 		, (error)-> 
 			error
-		, 3000)
+		, 1000)
 
 	setupCompass = ()->
 		compassElement = $("#compass")[0]
-		navigator.compass.watchHeading ((compass) -> compassElement.innerHTML = compass.magneticHeading), (error)-> console.log error, [{frequency:3000}]
+		navigator.compass.watchHeading(
+			(compass) -> 
+				compassElement.innerHTML = compass.magneticHeading
+			,(error) -> 
+				console.log error
+			, [{frequency:1000}])
 
 	setupLocation = ()->
 		latElement = $("#locationLat")[0]
@@ -92,15 +104,20 @@ class @Sensocamera.SensorManager
 		navigator.geolocation.watchPosition(
 			(position)->
 				console.log "Position Updated"
-				console.log position
+
+				sensorValues.locationLat = position.coords.latitude
+				sensorValues.locationLong = position.coords.longitude
+
+				sensorValues.locationAlt = position.coords.altitude
+
 				latElement.innerHTML = position.coords.latitude
 				longElement.innerHTML = position.coords.longitude
 				altElement.innerHTML = position.coords.altitude
 				console.log position.coords.altitude
 				headElement.innerHTML = position.coords.heading
 				console.log position.coords.heading
-			, (error)-> 
-				console.log error
+			,(error)-> 
+					console.log error
 			, {enableHighAccuracy: true}
 		)
 
@@ -111,12 +128,16 @@ class @Sensocamera.SensorManager
 		
 		db = base;
 		
-		checkSensorTable sensorId for sensorId in sensors
+		checkSensorsTable()
+
+		sensorValues[id] = 0 for id in sensors
 
 		setupAccelerometer()
 		setupArduino()
 		setupCompass()
 		setupLocation()
+
+		setTimeout(record, recordPeriod)
 
 		console.log "SensorManager Initialiased"
 
