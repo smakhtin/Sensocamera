@@ -6,7 +6,7 @@ class @Sensocamera.SensorManager
 	record = false
 	recordPeriod = 3000
 
-	sensorList = window.CosmObjects.Sensors
+	updatePeriod = 1000
 
 	sensorValues = {}
 
@@ -23,22 +23,30 @@ class @Sensocamera.SensorManager
 		)
 
 	recordValues = () ->
+		setTimeout(recordValues, recordPeriod)
 		if not record then return
 		
 		currentDate = new Date()
 		timeStamp = currentDate.toISOString()
 
+		finalResult = ""
 		for sensorName, sensorValue of sensorValues
-			db.transaction(
-				(tx) -> 
-					executionString = "INSERT INTO SENSORS(name, at, value) VALUES('#{sensorName}', '#{timeStamp}', '#{sensorValue}')"
-					tx.executeSql executionString
-				, (error) -> 
-					console.log error
-					console.log "Can't record #{sensorId}"
-				, (success) -> 
-					console.log "#{sensorId} data recorded"
-			)
+			result = "SELECT '#{sensorName}', '#{timeStamp}', '#{sensorValue}' UNION ALL "
+			finalResult += result
+
+		finalResult = finalResult.slice(0, -11)
+		db.transaction(
+			(tx) -> 
+				executionString = "INSERT INTO SENSORS(name, at, value) #{finalResult}"
+				console.log executionString
+				tx.executeSql executionString
+			, (error) -> 
+				console.log error
+				console.log "Can't record"
+			, (success) -> 
+				console.log "Data recorded"
+		)
+		sensorValue
 
 	setupAccelerometer = () ->
 		elementX = $("#accelerometerX")[0]
@@ -51,12 +59,12 @@ class @Sensocamera.SensorManager
 				sensorValues.accelerometerY = acceleration.y
 				sensorValues.accelerometerZ = acceleration.z
 
-				elementX.innerHTML = accelerationX
-				elementY.innerHTML = accelerationY
-				elementZ.innerHTML = accelerationZ
+				elementX.innerHTML = sensorValues.accelerometerX
+				elementY.innerHTML = sensorValues.accelerometerY
+				elementZ.innerHTML = sensorValues.accelerometerZ
 			, (error) ->
 				console.log "Error: Can't access accelerometer"
-			, {frequency:1000})
+			, {frequency:updatePeriod})
 
 	setupArduino = () ->
 		gasElement = $("#gas")[0]
@@ -85,7 +93,7 @@ class @Sensocamera.SensorManager
 				lightElement.innerHTML = success.light
 		, (error)-> 
 			error
-		, 1000)
+		, updatePeriod)
 
 	setupCompass = ()->
 		compassElement = $("#compass")[0]
@@ -94,7 +102,7 @@ class @Sensocamera.SensorManager
 				compassElement.innerHTML = compass.magneticHeading
 			,(error) -> 
 				console.log error
-			, [{frequency:1000}])
+			, [{frequency:updatePeriod}])
 
 	setupLocation = ()->
 		latElement = $("#locationLat")[0]
@@ -137,7 +145,7 @@ class @Sensocamera.SensorManager
 		setupCompass()
 		setupLocation()
 
-		setTimeout(record, recordPeriod)
+		setTimeout(recordValues, recordPeriod)
 
 		console.log "SensorManager Initialiased"
 

@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorsTable, db, record, recordPeriod, recordValues, sensorEnum, sensorList, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation;
+    var checkSensorsTable, db, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation, updatePeriod;
 
     sensors = [];
 
@@ -14,7 +14,7 @@
 
     recordPeriod = 3000;
 
-    sensorList = window.CosmObjects.Sensors;
+    updatePeriod = 1000;
 
     sensorValues = {};
 
@@ -32,27 +32,32 @@
     };
 
     recordValues = function() {
-      var currentDate, sensorName, sensorValue, timeStamp, _results;
+      var currentDate, finalResult, result, sensorName, sensorValue, timeStamp;
+      setTimeout(recordValues, recordPeriod);
       if (!record) {
         return;
       }
       currentDate = new Date();
       timeStamp = currentDate.toISOString();
-      _results = [];
+      finalResult = "";
       for (sensorName in sensorValues) {
         sensorValue = sensorValues[sensorName];
-        _results.push(db.transaction(function(tx) {
-          var executionString;
-          executionString = "INSERT INTO SENSORS(name, at, value) VALUES('" + sensorName + "', '" + timeStamp + "', '" + sensorValue + "')";
-          return tx.executeSql(executionString);
-        }, function(error) {
-          console.log(error);
-          return console.log("Can't record " + sensorId);
-        }, function(success) {
-          return console.log("" + sensorId + " data recorded");
-        }));
+        result = "SELECT '" + sensorName + "', '" + timeStamp + "', '" + sensorValue + "' UNION ALL ";
+        finalResult += result;
       }
-      return _results;
+      finalResult = finalResult.slice(0, -11);
+      db.transaction(function(tx) {
+        var executionString;
+        executionString = "INSERT INTO SENSORS(name, at, value) " + finalResult;
+        console.log(executionString);
+        return tx.executeSql(executionString);
+      }, function(error) {
+        console.log(error);
+        return console.log("Can't record");
+      }, function(success) {
+        return console.log("Data recorded");
+      });
+      return sensorValue;
     };
 
     setupAccelerometer = function() {
@@ -64,13 +69,13 @@
         sensorValues.accelerometerX = acceleration.x;
         sensorValues.accelerometerY = acceleration.y;
         sensorValues.accelerometerZ = acceleration.z;
-        elementX.innerHTML = accelerationX;
-        elementY.innerHTML = accelerationY;
-        return elementZ.innerHTML = accelerationZ;
+        elementX.innerHTML = sensorValues.accelerometerX;
+        elementY.innerHTML = sensorValues.accelerometerY;
+        return elementZ.innerHTML = sensorValues.accelerometerZ;
       }, function(error) {
         return console.log("Error: Can't access accelerometer");
       }, {
-        frequency: 1000
+        frequency: updatePeriod
       });
     };
 
@@ -100,7 +105,7 @@
         return lightElement.innerHTML = success.light;
       }, function(error) {
         return error;
-      }, 1000);
+      }, updatePeriod);
     };
 
     setupCompass = function() {
@@ -112,7 +117,7 @@
         return console.log(error);
       }, [
         {
-          frequency: 1000
+          frequency: updatePeriod
         }
       ]);
     };
@@ -156,7 +161,7 @@
       setupArduino();
       setupCompass();
       setupLocation();
-      setTimeout(record, recordPeriod);
+      setTimeout(recordValues, recordPeriod);
       console.log("SensorManager Initialiased");
     }
 
