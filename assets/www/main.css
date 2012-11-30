@@ -18,6 +18,13 @@
 	background:url(img/button-stop.png) no-repeat;
 }
 
+.horizontalGroup {
+	/*float: left;*/
+	position: relative;
+	display:block;
+	clear: both;
+}
+
 .horizontalObject, .sensorLabel, .sensorValue {
 	float: left;
 	text-align:left;
@@ -28,8 +35,11 @@
 	color:#878787;
 	padding-left: 5px;
 	padding-right: 5px;
+	padding-bottom: 5px;
 }
 
 .sensorValue {
-	
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-bottom: 5px;
 }

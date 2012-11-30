@@ -70,6 +70,7 @@ class @Sensocamera.SensorManager
 		adk.watchAcceleration(
 			(success)-> 
 				console.log "Updating sensor Values"
+				if success is null or success is undefined then return
 				gasElement.innerHTML = success.gas
 				temperatureElement.innerHTML = success.temperature
 				pressureElement.innerHTML = success.pressure
@@ -78,6 +79,30 @@ class @Sensocamera.SensorManager
 		, (error)-> 
 			error
 		, 3000)
+
+	setupCompass = ()->
+		compassElement = $("#compass")[0]
+		navigator.compass.watchHeading ((compass) -> compassElement.innerHTML = compass.magneticHeading), (error)-> console.log error, [{frequency:3000}]
+
+	setupLocation = ()->
+		latElement = $("#locationLat")[0]
+		longElement = $("#locationLong")[0]
+		altElement = $("#locationAlt")[0]
+		headElement = $("#locationHead")[0]
+		navigator.geolocation.watchPosition(
+			(position)->
+				console.log "Position Updated"
+				console.log position
+				latElement.innerHTML = position.coords.latitude
+				longElement.innerHTML = position.coords.longitude
+				altElement.innerHTML = position.coords.altitude
+				console.log position.coords.altitude
+				headElement.innerHTML = position.coords.heading
+				console.log position.coords.heading
+			, (error)-> 
+				console.log error
+			, {enableHighAccuracy: true}
+		)
 
 	constructor: (base, @sensors) ->
 		console.log "SensorManager Started"
@@ -90,6 +115,8 @@ class @Sensocamera.SensorManager
 
 		setupAccelerometer()
 		setupArduino()
+		setupCompass()
+		setupLocation()
 
 		console.log "SensorManager Initialiased"
 
@@ -97,7 +124,7 @@ class @Sensocamera.SensorManager
 		console.log "Syncing sensor #{sensorId}"
 		db.transaction (tx) ->
 			tx.executeSql(
-				"SELECT at, value FROM #{sensorId.toUpperCase()}", []
+				"SELECT at, value FROM #{sensorId.toUpperCase()}" []
 				, (tx, sqlResult) -> 
 					data = (sqlResult.rows.item(i) for i in [0..sqlResult.rows.length - 1])
 					console.log JSON.stringify(data)

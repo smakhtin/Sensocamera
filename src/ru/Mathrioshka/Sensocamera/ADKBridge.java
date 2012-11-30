@@ -152,7 +152,7 @@ public class ADKBridge extends CordovaPlugin {
                         gasValue = val;
                         break;
                     case TEMPERATURE_SENSOR_ID:
-                        temperatureValue = val;
+                        temperatureValue = val / 100;
                         break;
                     case PRESSURE_SENSOR_ID:
                         pressureValue = val;
@@ -190,7 +190,6 @@ public class ADKBridge extends CordovaPlugin {
 	}
 
 	public void win() {
-        //gasValue +=1;
 		// Success return object
 		PluginResult result = new PluginResult(PluginResult.Status.OK, getSensorsJSON());
 		result.setKeepCallback(true);

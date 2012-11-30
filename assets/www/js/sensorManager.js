@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorTable, db, record, recordValue, sensorEnum, sensors, setupAccelerometer, setupArduino;
+    var checkSensorTable, db, record, recordValue, sensorEnum, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation;
 
     sensors = [];
 
@@ -78,6 +78,9 @@
       adk = new window.Sensocamera.ADKBridge();
       return adk.watchAcceleration(function(success) {
         console.log("Updating sensor Values");
+        if (success === null || success === void 0) {
+          return;
+        }
         gasElement.innerHTML = success.gas;
         temperatureElement.innerHTML = success.temperature;
         pressureElement.innerHTML = success.pressure;
@@ -86,6 +89,42 @@
       }, function(error) {
         return error;
       }, 3000);
+    };
+
+    setupCompass = function() {
+      var compassElement;
+      compassElement = $("#compass")[0];
+      return navigator.compass.watchHeading((function(compass) {
+        return compassElement.innerHTML = compass.magneticHeading;
+      }), function(error) {
+        return console.log(error, [
+          {
+            frequency: 3000
+          }
+        ]);
+      });
+    };
+
+    setupLocation = function() {
+      var altElement, headElement, latElement, longElement;
+      latElement = $("#locationLat")[0];
+      longElement = $("#locationLong")[0];
+      altElement = $("#locationAlt")[0];
+      headElement = $("#locationHead")[0];
+      return navigator.geolocation.watchPosition(function(position) {
+        console.log("Position Updated");
+        console.log(position);
+        latElement.innerHTML = position.coords.latitude;
+        longElement.innerHTML = position.coords.longitude;
+        altElement.innerHTML = position.coords.altitude;
+        console.log(position.coords.altitude);
+        headElement.innerHTML = position.coords.heading;
+        return console.log(position.coords.heading);
+      }, function(error) {
+        return console.log(error);
+      }, {
+        enableHighAccuracy: true
+      });
     };
 
     function SensorManager(base, sensors) {
@@ -100,13 +139,15 @@
       }
       setupAccelerometer();
       setupArduino();
+      setupCompass();
+      setupLocation();
       console.log("SensorManager Initialiased");
     }
 
     SensorManager.prototype.syncSensor = function(feedId, sensorId) {
       console.log("Syncing sensor " + sensorId);
       return db.transaction(function(tx) {
-        return tx.executeSql("SELECT at, value FROM " + (sensorId.toUpperCase()), [], function(tx, sqlResult) {
+        return tx.executeSql(("SELECT at, value FROM " + (sensorId.toUpperCase()))([], function(tx, sqlResult) {
           var data, i;
           data = (function() {
             var _i, _ref, _results;
@@ -128,7 +169,7 @@
         }, function(error) {
           console.log(error);
           return console.log("Looks like we have some problems with " + sensorId + " data");
-        });
+        }));
       });
     };
 
