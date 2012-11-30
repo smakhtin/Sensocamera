@@ -123,14 +123,26 @@
     };
 
     sync = function() {
-      var sensor, _i, _len, _results;
+      var s, sensor, status, _i, _len;
       console.log("Syncing With Server");
-      _results = [];
-      for (_i = 0, _len = allSensors.length; _i < _len; _i++) {
-        sensor = allSensors[_i];
-        _results.push(sensorManager.syncSensor(feedID, sensor));
+      status = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = allSensors.length; _i < _len; _i++) {
+          sensor = allSensors[_i];
+          _results.push(sensorManager.syncSensor(feedID, sensor));
+        }
+        return _results;
+      })();
+      for (_i = 0, _len = status.length; _i < _len; _i++) {
+        s = status[_i];
+        if (s !== true) {
+          console.log("Resync!");
+          sync();
+          return;
+        }
       }
-      return _results;
+      return sensorManager.clearData();
     };
 
     checkFeed = function(value) {

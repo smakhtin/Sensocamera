@@ -22,18 +22,21 @@ public class ADKBridge extends CordovaPlugin {
     public static final int PRESSURE_SENSOR_ID = 3;
     public static final int HUMIDITY_SENSOR_ID = 4;
     public static final int LIGHT_SENSOR_ID = 5;
+	public static final int SOUND_SENSOR_ID = 6;
 
     public static final String GAS = "gas";
     public static final String TEMPERATURE = "temperature";
     public static final String PRESSURE = "pressure";
     public static final String HUMIDITY = "humidity";
     public static final String LIGHT = "light";
+	public static final String SOUND = "sound";
 
     private int gasValue = 0;
     private int temperatureValue = 0;
     private int pressureValue = 0;
     private int humidityValue = 0;
     private int lightValue = 0;
+	private int soundValue = 0;
 
 	public static final String START = "start";
 	public static final String STOP = "stop";
@@ -163,6 +166,9 @@ public class ADKBridge extends CordovaPlugin {
                     case LIGHT_SENSOR_ID:
                         lightValue = val;
                         break;
+					case SOUND_SENSOR_ID:
+						soundValue = val;
+						break;
                 }
 
 				win();

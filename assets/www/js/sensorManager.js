@@ -88,7 +88,6 @@
       lightElement = $("#light")[0];
       adk = new window.Sensocamera.ADKBridge();
       return adk.watchAcceleration(function(success) {
-        console.log("Updating sensor Values");
         if (success === null || success === void 0) {
           return;
         }
@@ -162,14 +161,17 @@
       setupCompass();
       setupLocation();
       setTimeout(recordValues, recordPeriod);
-      console.log("SensorManager Initialiased");
+      console.log("SensorManager Initialized");
     }
 
     SensorManager.prototype.syncSensor = function(feedId, sensorId) {
-      console.log("Syncing sensor " + sensorId);
-      return db.transaction(function(tx) {
-        return tx.executeSql(("SELECT at, value FROM " + (sensorId.toUpperCase()))([], function(tx, sqlResult) {
+      console.log("Syncing sensors");
+      db.transaction(function(tx) {
+        return tx.executeSql("SELECT at, value FROM SENSORS WHERE name='" + sensorId + "'", [], function(tx, sqlResult) {
           var data, i;
+          if (sqlResult.rows.length <= 0) {
+            return false;
+          }
           data = (function() {
             var _i, _ref, _results;
             _results = [];
@@ -185,12 +187,22 @@
             console.log(res);
             if (res.status === 200) {
               return console.log("Delete stuff here");
+            } else {
+              return false;
             }
           });
         }, function(error) {
           console.log(error);
           return console.log("Looks like we have some problems with " + sensorId + " data");
-        }));
+        });
+      });
+      return true;
+    };
+
+    SensorManager.prototype.clearData = function() {
+      console.log("Clearing Data");
+      return db.transaction(function(tx) {
+        return tx.executeSql("DELETE FROM SENSORS");
       });
     };
 

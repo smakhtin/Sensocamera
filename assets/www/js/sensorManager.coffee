@@ -76,7 +76,6 @@ class @Sensocamera.SensorManager
 		adk = new window.Sensocamera.ADKBridge()
 		adk.watchAcceleration(
 			(success)-> 
-				console.log "Updating sensor Values"
 				if success is null or success is undefined then return
 
 				sensorValues.gas = success.gas
@@ -147,26 +146,36 @@ class @Sensocamera.SensorManager
 
 		setTimeout(recordValues, recordPeriod)
 
-		console.log "SensorManager Initialiased"
+		console.log "SensorManager Initialized"
 
 	syncSensor: (feedId, sensorId) ->
-		console.log "Syncing sensor #{sensorId}"
+		console.log "Syncing sensors"
 		db.transaction (tx) ->
 			tx.executeSql(
-				"SELECT at, value FROM #{sensorId.toUpperCase()}" []
+				"SELECT at, value FROM SENSORS WHERE name='#{sensorId}'", []
 				, (tx, sqlResult) -> 
+					if(sqlResult.rows.length <= 0) 
+						return false
 					data = (sqlResult.rows.item(i) for i in [0..sqlResult.rows.length - 1])
 					console.log JSON.stringify(data)
 					cosm.datapoint.new feedId, sensorId, {"datapoints":data}, (res) -> 
 						console.log res
 						if res.status == 200
 							console.log "Delete stuff here"
+						else
+							return false
 
 						
 				, (error) -> 
 					console.log error
 					console.log "Looks like we have some problems with #{sensorId} data"
 			)
+
+		return true
+
+	clearData: ()->
+		console.log "Clearing Data"
+		db.transaction (tx)-> tx.executeSql "DELETE FROM SENSORS"
 
 	startRecord: () ->
 		record = true
