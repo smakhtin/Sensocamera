@@ -8,6 +8,8 @@ class @Sensocamera.SensorManager
 
 	updatePeriod = 1000
 
+	maxSyncAttemptsCount = 10
+
 	sensorValues = {}
 
 	checkSensorsTable = (sensorId) ->
@@ -150,30 +152,36 @@ class @Sensocamera.SensorManager
 
 	syncSensor: (feedId, sensorId) ->
 		console.log "Syncing sensors"
+		synced = false
 		db.transaction (tx) ->
 			tx.executeSql(
 				"SELECT at, value FROM SENSORS WHERE name='#{sensorId}'", []
 				, (tx, sqlResult) -> 
-					if(sqlResult.rows.length <= 0) 
-						return false
+					throw "No Data Recorded for #{sensorId}" if sqlResult.rows.length <= 0
+					
 					data = (sqlResult.rows.item(i) for i in [0..sqlResult.rows.length - 1])
-					console.log JSON.stringify(data)
-					cosm.datapoint.new feedId, sensorId, {"datapoints":data}, (res) -> 
-						console.log res
-						if res.status == 200
-							console.log "Delete stuff here"
-						else
-							return false
-
-						
-				, (error) -> 
-					console.log error
-					console.log "Looks like we have some problems with #{sensorId} data"
+					
+					attempt = 0
+					until synced || attempt < maxSyncAttemptsCount
+						synced = pushData(feedId, sensorId, data)
+						attempt++
+				, (error) ->
+					throw "Cannot perform SELECT query for #{sensorId}"
 			)
 
-		return true
+		return synced
 
-	clearData: ()->
+	pushData = (feedId, sensorId, data) ->
+		cosm.datapoint.new feedId, sensorId, {"datapoints":data}
+		, (res) ->
+			if res.status == 200
+				db.transaction (tx)-> tx.executeSql "DELETE FROM SENSORS WHERE name='#{sensorId}'"
+				return true
+			else
+				return false
+
+
+	clearAllData: ()->
 		console.log "Clearing Data"
 		db.transaction (tx)-> tx.executeSql "DELETE FROM SENSORS"
 

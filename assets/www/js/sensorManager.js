@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorsTable, db, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation, updatePeriod;
+    var checkSensorsTable, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation, updatePeriod;
 
     sensors = [];
 
@@ -15,6 +15,8 @@
     recordPeriod = 3000;
 
     updatePeriod = 1000;
+
+    maxSyncAttemptsCount = 10;
 
     sensorValues = {};
 
@@ -165,12 +167,14 @@
     }
 
     SensorManager.prototype.syncSensor = function(feedId, sensorId) {
+      var synced;
       console.log("Syncing sensors");
+      synced = false;
       db.transaction(function(tx) {
         return tx.executeSql("SELECT at, value FROM SENSORS WHERE name='" + sensorId + "'", [], function(tx, sqlResult) {
-          var data, i;
+          var attempt, data, i, _results;
           if (sqlResult.rows.length <= 0) {
-            return false;
+            throw "No Data Recorded for " + sensorId;
           }
           data = (function() {
             var _i, _ref, _results;
@@ -180,26 +184,36 @@
             }
             return _results;
           })();
-          console.log(JSON.stringify(data));
-          return cosm.datapoint["new"](feedId, sensorId, {
-            "datapoints": data
-          }, function(res) {
-            console.log(res);
-            if (res.status === 200) {
-              return console.log("Delete stuff here");
-            } else {
-              return false;
-            }
-          });
+          attempt = 0;
+          _results = [];
+          while (!(synced || attempt < maxSyncAttemptsCount)) {
+            synced = pushData(feedId, sensorId, data);
+            _results.push(attempt++);
+          }
+          return _results;
         }, function(error) {
-          console.log(error);
-          return console.log("Looks like we have some problems with " + sensorId + " data");
+          throw "Cannot perform SELECT query for " + sensorId;
         });
       });
-      return true;
+      return synced;
     };
 
-    SensorManager.prototype.clearData = function() {
+    pushData = function(feedId, sensorId, data) {
+      return cosm.datapoint["new"](feedId, sensorId, {
+        "datapoints": data
+      }, function(res) {
+        if (res.status === 200) {
+          db.transaction(function(tx) {
+            return tx.executeSql("DELETE FROM SENSORS WHERE name='" + sensorId + "'");
+          });
+          return true;
+        } else {
+          return false;
+        }
+      });
+    };
+
+    SensorManager.prototype.clearAllData = function() {
       console.log("Clearing Data");
       return db.transaction(function(tx) {
         return tx.executeSql("DELETE FROM SENSORS");
