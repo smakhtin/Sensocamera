@@ -129,12 +129,12 @@
       _results = [];
       for (_i = 0, _len = allSensors.length; _i < _len; _i++) {
         sensor = allSensors[_i];
-        setTimeout((function() {
-          if (!sensorManager.syncSensor(feedID, sensor)) {
-            throw "Can't sync";
-          }
-        }), order * 1000);
-        _results.push(order++);
+        _results.push((function(sensor) {
+          setTimeout((function() {
+            return sensorManager.syncSensor(feedID, sensor);
+          }), order * 1000);
+          return order++;
+        })(sensor));
       }
       return _results;
     };

@@ -107,8 +107,9 @@ class @Sensocamera.Controller
 		console.log "Syncing With Server"
 		order = 0
 		for sensor in allSensors
-			setTimeout (() -> throw "Can't sync" if not sensorManager.syncSensor(feedID, sensor)), order * 1000
-			order++
+			do(sensor) ->
+				setTimeout (()->sensorManager.syncSensor(feedID, sensor)), order * 1000
+				order++
 
 	checkFeed = (value) ->
 		console.log "Checking feed " + value
