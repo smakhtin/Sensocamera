@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorsTable, db, maxSyncAttemptsCount, pushData, pushQuery, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, setupAccelerometer, setupArduino, setupCompass, setupLocation, updatePeriod;
+    var checkSensorsTable, datapointsRecorded, datapointsRecordedField, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, sensorsSynced, setDatapointsRecorded, setupAccelerometer, setupArduino, setupCompass, setupLocation, setupRecordCounter, updatePeriod;
 
     sensors = [];
 
@@ -20,7 +20,11 @@
 
     sensorValues = {};
 
-    pushQuery = 0;
+    datapointsRecorded = 0;
+
+    datapointsRecordedField = null;
+
+    sensorsSynced = 0;
 
     checkSensorsTable = function(sensorId) {
       return db.transaction(function(tx) {
@@ -38,7 +42,7 @@
     recordValues = function() {
       var currentDate, finalResult, result, sensorName, sensorValue, timeStamp;
       setTimeout(recordValues, recordPeriod);
-      if (!record) {
+      if (!record || datapointsRecorded >= 500) {
         return;
       }
       currentDate = new Date();
@@ -61,7 +65,16 @@
       }, function(success) {
         return console.log("Data recorded");
       });
-      return sensorValue;
+      return setDatapointsRecorded(datapointsRecorded + 1);
+    };
+
+    setDatapointsRecorded = function(value) {
+      datapointsRecorded = value;
+      datapointsRecordedField.innerHTML = datapointsRecorded;
+      return db.transaction(function(tx) {
+        tx.executeSql("UPDATE SETTINGS SET value='" + datapointsRecorded + "' WHERE name='datapointsRecorded'");
+        return tx.executeSql("UPDATE SETTINGS SET value='" + sensorsSynced + "' WHERE name='sensorsSynced'");
+      });
     };
 
     setupAccelerometer = function() {
@@ -149,6 +162,20 @@
       });
     };
 
+    setupRecordCounter = function() {
+      datapointsRecordedField = $("#recordedCount")[0];
+      db.transaction(function(tx) {
+        return tx.executeSql("SELECT value FROM SETTINGS WHERE name='sensorsSynced'", [], function(tx, sqlResult) {
+          return sensorsSynced = parseInt(sqlResult.rows.item(0).value);
+        });
+      });
+      return db.transaction(function(tx) {
+        return tx.executeSql("SELECT value FROM SETTINGS WHERE name='datapointsRecorded'", [], function(tx, sqlResult) {
+          return setDatapointsRecorded(parseInt(sqlResult.rows.item(0).value));
+        });
+      });
+    };
+
     function SensorManager(base, sensors) {
       var id, _i, _len;
       this.sensors = sensors;
@@ -164,6 +191,7 @@
       setupArduino();
       setupCompass();
       setupLocation();
+      setupRecordCounter();
       setTimeout(recordValues, recordPeriod);
       console.log("SensorManager Initialized");
     }
@@ -199,9 +227,14 @@
       }, function(res) {
         if (res.status === 200) {
           console.log("Synced data for " + sensorId + ". Now clearing.");
-          return db.transaction(function(tx) {
+          db.transaction(function(tx) {
             return tx.executeSql("DELETE FROM SENSORS WHERE name='" + sensorId + "'");
           });
+          sensorsSynced++;
+          if (sensorsSynced >= Object.keys(sensorValues).length) {
+            setDatapointsRecorded(0);
+            return sensorsSynced = 0;
+          }
         } else {
           console.log("Can't push data for " + sensorId);
           return console.log(res);

@@ -23,6 +23,8 @@ class @Sensocamera.Controller
 				db.transaction (tx) -> 
 					tx.executeSql "CREATE TABLE SETTINGS(id integer primary key, name text, value text)"
 					tx.executeSql "INSERT INTO SETTINGS(name, value) VALUES('feedID', '')"
+					tx.executeSql "INSERT INTO SETTINGS(name, value) VALUES('datapointsRecorded', '0')"
+					tx.executeSql "INSERT INTO SETTINGS(name, value) VALUES('sensorsSynced', '0')"
 			, (success) ->
 				console.log "We already have PREFERENCES table, congratulations"
 				checkPreferecnes()

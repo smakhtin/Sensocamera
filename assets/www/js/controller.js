@@ -31,7 +31,9 @@
         console.log(error);
         return db.transaction(function(tx) {
           tx.executeSql("CREATE TABLE SETTINGS(id integer primary key, name text, value text)");
-          return tx.executeSql("INSERT INTO SETTINGS(name, value) VALUES('feedID', '')");
+          tx.executeSql("INSERT INTO SETTINGS(name, value) VALUES('feedID', '')");
+          tx.executeSql("INSERT INTO SETTINGS(name, value) VALUES('datapointsRecorded', '0')");
+          return tx.executeSql("INSERT INTO SETTINGS(name, value) VALUES('sensorsSynced', '0')");
         });
       }, function(success) {
         console.log("We already have PREFERENCES table, congratulations");

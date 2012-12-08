@@ -11,7 +11,10 @@ class @Sensocamera.SensorManager
 	maxSyncAttemptsCount = 2
 
 	sensorValues = {}
-	pushQuery = 0
+
+	datapointsRecorded = 0
+	datapointsRecordedField = null
+	sensorsSynced = 0
 
 	checkSensorsTable = (sensorId) ->
 		db.transaction(
@@ -27,7 +30,8 @@ class @Sensocamera.SensorManager
 
 	recordValues = () ->
 		setTimeout(recordValues, recordPeriod)
-		if not record then return
+		
+		if not record or datapointsRecorded >= 500 then return
 		
 		currentDate = new Date()
 		timeStamp = currentDate.toISOString()
@@ -49,7 +53,16 @@ class @Sensocamera.SensorManager
 			, (success) -> 
 				console.log "Data recorded"
 		)
-		sensorValue
+
+		setDatapointsRecorded datapointsRecorded + 1
+		
+
+	setDatapointsRecorded = (value)->
+		datapointsRecorded = value
+		datapointsRecordedField.innerHTML = datapointsRecorded
+		db.transaction (tx) -> 
+			tx.executeSql "UPDATE SETTINGS SET value='#{datapointsRecorded}' WHERE name='datapointsRecorded'"
+			tx.executeSql "UPDATE SETTINGS SET value='#{sensorsSynced}' WHERE name='sensorsSynced'"
 
 	setupAccelerometer = () ->
 		elementX = $("#accelerometerX")[0]
@@ -131,6 +144,18 @@ class @Sensocamera.SensorManager
 			, {enableHighAccuracy: true}
 		)
 
+	setupRecordCounter = ()->
+		datapointsRecordedField = $("#recordedCount")[0]
+		db.transaction (tx) -> tx.executeSql("SELECT value FROM SETTINGS WHERE name='sensorsSynced'", [],
+			(tx, sqlResult) ->
+				sensorsSynced = parseInt(sqlResult.rows.item(0).value)
+		)
+
+		db.transaction (tx) -> tx.executeSql("SELECT value FROM SETTINGS WHERE name='datapointsRecorded'", [],
+			(tx, sqlResult) ->
+				setDatapointsRecorded parseInt(sqlResult.rows.item(0).value)
+		)
+
 	constructor: (base, @sensors) ->
 		console.log "SensorManager Started"
 
@@ -146,6 +171,8 @@ class @Sensocamera.SensorManager
 		setupArduino()
 		setupCompass()
 		setupLocation()
+		
+		setupRecordCounter()
 
 		setTimeout(recordValues, recordPeriod)
 
@@ -176,6 +203,11 @@ class @Sensocamera.SensorManager
 			if res.status == 200
 				console.log "Synced data for #{sensorId}. Now clearing."
 				db.transaction (tx)-> tx.executeSql "DELETE FROM SENSORS WHERE name='#{sensorId}'"
+				sensorsSynced++
+
+				if(sensorsSynced >= Object.keys(sensorValues).length)
+					setDatapointsRecorded 0
+					sensorsSynced = 0
 			else
 				console.log "Can't push data for #{sensorId}"
 				console.log res				

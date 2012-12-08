@@ -34,14 +34,20 @@
 </head>
 <body>
 	<div data-role="page" id="record">
+		<div data-role="content">
+			<button id="syncButton">Sync</button>
 		<button class="recordButton" id="recordButton" data-role="none">Record</button>
-		<button id="syncButton">Sync</button>
+		<div class="horizontalGroup">
+			<div class="sensorLabel" id="recordedCountLabel">Datapoints Recorded:</div>
+			<div class="horizontalObject sensorValue" id="recordedCount">null</div>
+		</div>
+		</div>
 		<div data-role="footer" data-id="mainHeader" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#record" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Record</a></li>
-					<li><a href="#status" data-prefetch="true" data-transition="pop">Status</a></li>
-					<li><a href="#settings" data-prefetch="true" data-transition="pop">Settings</a></li>
+					<li><a href="#record" data-prefetch="true" data-feedsition="none" class="ui-btn-active ui-state-persist">Record</a></li>
+					<li><a href="#status" data-prefetch="true" data-feedsition="none">Status</a></li>
+					<li><a href="#settings" data-prefetch="true" data-transition="none">Settings</a></li>
 				</ul>
 			</div>
 		</div>
@@ -92,9 +98,9 @@
 			<div data-role="footer" data-id="mainHeader" data-position="fixed">
 				<div data-role="navbar">
 					<ul>
-						<li><a href="#record" data-prefetch="true" data-transition="pop">Record</a></li>
-						<li><a href="#status" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Status</a></li>
-						<li><a href="#settings" data-prefetch="true" data-transition="pop">Settings</a></li>
+						<li><a href="#record" data-prefetch="true" data-transition="none">Record</a></li>
+						<li><a href="#status" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Status</a></li>
+						<li><a href="#settings" data-prefetch="true" data-transition="none">Settings</a></li>
 					</ul>
 				</div>
 			</div>
@@ -108,9 +114,9 @@
 		<div data-role="footer" data-id="mainHeader" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#record" data-prefetch="true" data-transition="pop">Record</a></li>
-					<li><a href="#status" data-prefetch="true" data-transition="pop">Status</a></li>
-					<li><a href="#settings" data-prefetch="true" data-transition="pop" class="ui-btn-active ui-state-persist">Settings</a></li>
+					<li><a href="#record" data-prefetch="true" data-transition="none">Record</a></li>
+					<li><a href="#status" data-prefetch="true" data-transition="none">Status</a></li>
+					<li><a href="#settings" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Settings</a></li>
 				</ul>
 			</div>
 		</div>
