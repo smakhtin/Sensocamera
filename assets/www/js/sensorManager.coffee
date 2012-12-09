@@ -88,18 +88,21 @@ class @Sensocamera.SensorManager
 		pressureElement = $("#pressure")[0]
 		humidityElement = $("#humidity")[0]
 		lightElement = $("#light")[0]
+		soundElement = $("#sound")[0]
 
 		adk = new window.Sensocamera.ADKBridge()
 		adk.watchAcceleration(
 			(success)-> 
 				if success is null or success is undefined then return
 
+				sound = success.sound
+
 				sensorValues.gas = success.gas
 				sensorValues.temperature = success.temperature
 				sensorValues.pressure = success.pressure
 				sensorValues.humidity = success.humidity
 				sensorValues.light = success.light
-				sensorValues.sound = success.sound
+				sensorValues.sound = success.sound if sound != undefined and sound != null 
 
 				gasElement.innerHTML = success.gas
 				temperatureElement.innerHTML = success.temperature
@@ -114,6 +117,8 @@ class @Sensocamera.SensorManager
 		compassElement = $("#compass")[0]
 		navigator.compass.watchHeading(
 			(compass) -> 
+				heading = compass.magneticHeading
+				sensorValues.compass = heading if heading != undefined and heading != null
 				compassElement.innerHTML = compass.magneticHeading
 			,(error) -> 
 				console.log error
@@ -126,19 +131,18 @@ class @Sensocamera.SensorManager
 		headElement = $("#locationHead")[0]
 		navigator.geolocation.watchPosition(
 			(position)->
-				console.log "Position Updated"
+				lat = position.coords.latitude
+				long = position.coords.longitude
+				alt = position.coords.altitude
 
-				sensorValues.locationLat = position.coords.latitude
-				sensorValues.locationLong = position.coords.longitude
+				sensorValues.locationLat = lat
+				sensorValues.locationLong = long
+				sensorValues.locationAlt = alt if alt != undefined and alt != null
 
-				sensorValues.locationAlt = position.coords.altitude
-
-				latElement.innerHTML = position.coords.latitude
-				longElement.innerHTML = position.coords.longitude
-				altElement.innerHTML = position.coords.altitude
-				console.log position.coords.altitude
+				latElement.innerHTML = lat
+				longElement.innerHTML = long
+				altElement.innerHTML = alt
 				headElement.innerHTML = position.coords.heading
-				console.log position.coords.heading
 			,(error)-> 
 					console.log error
 			, {enableHighAccuracy: true}

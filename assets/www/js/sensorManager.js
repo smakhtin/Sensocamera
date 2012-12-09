@@ -97,23 +97,28 @@
     };
 
     setupArduino = function() {
-      var adk, gasElement, humidityElement, lightElement, pressureElement, temperatureElement;
+      var adk, gasElement, humidityElement, lightElement, pressureElement, soundElement, temperatureElement;
       gasElement = $("#gas")[0];
       temperatureElement = $("#temperature")[0];
       pressureElement = $("#pressure")[0];
       humidityElement = $("#humidity")[0];
       lightElement = $("#light")[0];
+      soundElement = $("#sound")[0];
       adk = new window.Sensocamera.ADKBridge();
       return adk.watchAcceleration(function(success) {
+        var sound;
         if (success === null || success === void 0) {
           return;
         }
+        sound = success.sound;
         sensorValues.gas = success.gas;
         sensorValues.temperature = success.temperature;
         sensorValues.pressure = success.pressure;
         sensorValues.humidity = success.humidity;
         sensorValues.light = success.light;
-        sensorValues.sound = success.sound;
+        if (sound !== void 0 && sound !== null) {
+          sensorValues.sound = success.sound;
+        }
         gasElement.innerHTML = success.gas;
         temperatureElement.innerHTML = success.temperature;
         pressureElement.innerHTML = success.pressure;
@@ -128,6 +133,11 @@
       var compassElement;
       compassElement = $("#compass")[0];
       return navigator.compass.watchHeading(function(compass) {
+        var heading;
+        heading = compass.magneticHeading;
+        if (heading !== void 0 && heading !== null) {
+          sensorValues.compass = heading;
+        }
         return compassElement.innerHTML = compass.magneticHeading;
       }, function(error) {
         return console.log(error);
@@ -145,16 +155,19 @@
       altElement = $("#locationAlt")[0];
       headElement = $("#locationHead")[0];
       return navigator.geolocation.watchPosition(function(position) {
-        console.log("Position Updated");
-        sensorValues.locationLat = position.coords.latitude;
-        sensorValues.locationLong = position.coords.longitude;
-        sensorValues.locationAlt = position.coords.altitude;
-        latElement.innerHTML = position.coords.latitude;
-        longElement.innerHTML = position.coords.longitude;
-        altElement.innerHTML = position.coords.altitude;
-        console.log(position.coords.altitude);
-        headElement.innerHTML = position.coords.heading;
-        return console.log(position.coords.heading);
+        var alt, lat, long;
+        lat = position.coords.latitude;
+        long = position.coords.longitude;
+        alt = position.coords.altitude;
+        sensorValues.locationLat = lat;
+        sensorValues.locationLong = long;
+        if (alt !== void 0 && alt !== null) {
+          sensorValues.locationAlt = alt;
+        }
+        latElement.innerHTML = lat;
+        longElement.innerHTML = long;
+        altElement.innerHTML = alt;
+        return headElement.innerHTML = position.coords.heading;
       }, function(error) {
         return console.log(error);
       }, {
