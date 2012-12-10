@@ -123,7 +123,8 @@
         temperatureElement.innerHTML = success.temperature;
         pressureElement.innerHTML = success.pressure;
         humidityElement.innerHTML = success.humidity;
-        return lightElement.innerHTML = success.light;
+        lightElement.innerHTML = success.light;
+        return soundElement.innerHTML = success.sound;
       }, function(error) {
         return error;
       }, updatePeriod);

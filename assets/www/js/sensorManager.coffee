@@ -82,6 +82,23 @@ class @Sensocamera.SensorManager
 				console.log "Error: Can't access accelerometer"
 			, {frequency:updatePeriod})
 
+	setupManeticField = () ->
+		magneticFieldXElement = $("#magneticFieldX")[0];
+		magneticFieldYElement = $("#magneticFieldY")[0];
+		magneticFieldZElement = $("#magneticFieldZ")[0];
+
+		magneticField = new window.Sensocamera.ExternalSensor "MagneticField"
+		magneticField.watchData(
+			(success)-> 
+				if success is null or success is undefined then return
+
+				magneticFieldXElement.innerHTML = sensorValues.magneticFieldX = success.x;
+				magneticFieldYElement.innerHTML = sensorValues.magneticFieldY = success.y;
+				magneticFieldZElement.innerHTML = sensorValues.magneticFieldZ = success.z;
+		, (error)->
+			error
+		, updatePeriod)
+
 	setupArduino = () ->
 		gasElement = $("#gas")[0]
 		temperatureElement = $("#temperature")[0]
@@ -90,8 +107,12 @@ class @Sensocamera.SensorManager
 		lightElement = $("#light")[0]
 		soundElement = $("#sound")[0]
 
-		adk = new window.Sensocamera.ADKBridge()
-		adk.watchAcceleration(
+		colorRElement = $('#colorR')[0];
+		colorGElement = $('#colorG')[0];
+		colorBElement = $('#colorB')[0];
+
+		adk = new window.Sensocamera.ExternalSensor "ADKBridge"
+		adk.watchData(
 			(success)-> 
 				if success is null or success is undefined then return
 
@@ -102,13 +123,22 @@ class @Sensocamera.SensorManager
 				sensorValues.pressure = success.pressure
 				sensorValues.humidity = success.humidity
 				sensorValues.light = success.light
-				sensorValues.sound = success.sound if sound != undefined and sound != null 
+				sensorValues.sound = success.sound if sound != undefined and sound != null
+				
+				sensorValues.colorR = success.colorR;
+				sensorValues.colorG = success.colorG;
+				sensorValues.colorB = success.colorB;
 
 				gasElement.innerHTML = success.gas
 				temperatureElement.innerHTML = success.temperature
 				pressureElement.innerHTML = success.pressure
 				humidityElement.innerHTML = success.humidity
 				lightElement.innerHTML = success.light
+				soundElement.innerHTML = success.sound
+
+				colorRElement.innerHTML = success.colorR
+				colorGElement.innerHTML = success.colorG
+				colorBElement.innerHTML = success.colorB
 		, (error)-> 
 			error
 		, updatePeriod)

@@ -1,4 +1,4 @@
-class @Sensocamera.ADKBridge
+class @Sensocamera.ExternalSensor
 	START_ACTION = "start"
 	STOP_ACTION = "stop"
 
@@ -14,10 +14,13 @@ class @Sensocamera.ADKBridge
 
 	sensors = null;
 
-	constructor: ()->
+	sensorName = ""
+
+	constructor: (name)->
+		sensorName = name
 		setState(STATE_STARTING)
 
-	watchAcceleration: (success, error, period)->
+	watchData: (success, error, period)->
 		setState(STATE_STARTING)
 		refreshPeriod = period
 		intervalAction = setInterval (() -> success(sensors)), refreshPeriod
@@ -33,7 +36,7 @@ class @Sensocamera.ADKBridge
 				if currentState is STATE_STARTING
 					setState STATE_FAILED
 					console.log error
-			, "ADKBridge", action, params
+			, sensorName, action, params
 		)
 
 	setState = (state) ->
@@ -46,7 +49,7 @@ class @Sensocamera.ADKBridge
 				callNativeFunction(STOP_ACTION, [])
 				clearInterval(intervalAction)
 			when STATE_STARTING
-				console.log "Starting ADK"
+				console.log "Starting #{sensorName}"
 				callNativeFunction(START_ACTION, [])
 			when STATE_FAILED
-				console.log "ADKBridge failded to start"
+				console.log "#{sensorName} failded to start"

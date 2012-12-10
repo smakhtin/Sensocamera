@@ -1,6 +1,5 @@
 package ru.Mathrioshka.Sensocamera;
 
-import android.util.Log;
 import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaPlugin;
 import org.apache.cordova.api.PluginResult;
@@ -14,7 +13,6 @@ import org.microbridge.server.Server;
 import org.microbridge.server.ServerListener;
 
 import java.io.IOException;
-import java.util.Timer;
 
 public class ADKBridge extends CordovaPlugin {
     public static final int GAS_SENSOR_ID = 1;
@@ -23,6 +21,9 @@ public class ADKBridge extends CordovaPlugin {
     public static final int HUMIDITY_SENSOR_ID = 4;
     public static final int LIGHT_SENSOR_ID = 5;
 	public static final int SOUND_SENSOR_ID = 6;
+    public static final int COLOR_R_ID = 7;
+    public static final int COLOR_G_ID = 8;
+    public static final int COLOR_B_ID = 9;
 
     public static final String GAS = "gas";
     public static final String TEMPERATURE = "temperature";
@@ -30,6 +31,9 @@ public class ADKBridge extends CordovaPlugin {
     public static final String HUMIDITY = "humidity";
     public static final String LIGHT = "light";
 	public static final String SOUND = "sound";
+    public static final String COLOR_R = "colorR";
+    public static final String COLOR_G = "colorG";
+    public static final String COLOR_B = "colorB";
 
     private int gasValue = 0;
     private int temperatureValue = 0;
@@ -37,6 +41,9 @@ public class ADKBridge extends CordovaPlugin {
     private int humidityValue = 0;
     private int lightValue = 0;
 	private int soundValue = 0;
+    private int colorRValue = 0;
+    private int colorGValue = 0;
+    private int colorBValue = 0;
 
 	public static final String START = "start";
 	public static final String STOP = "stop";
@@ -53,8 +60,8 @@ public class ADKBridge extends CordovaPlugin {
 	Server server;
 	ServerListener listener;
 
-    Timer timer = new Timer();
-    MyTask myTask = new MyTask(this);
+    //Timer timer = new Timer();
+    //MyTask myTask = new MyTask(this);
 
     public ADKBridge()
     {
@@ -169,6 +176,15 @@ public class ADKBridge extends CordovaPlugin {
 					case SOUND_SENSOR_ID:
 						soundValue = val;
 						break;
+                    case COLOR_R_ID:
+                        colorRValue = val;
+                        break;
+                    case COLOR_G_ID:
+                        colorGValue = val;
+                        break;
+                    case COLOR_B_ID:
+                        colorBValue = val;
+                        break;
                 }
 
 				win();
@@ -211,6 +227,10 @@ public class ADKBridge extends CordovaPlugin {
 			r.put(PRESSURE, pressureValue);
 			r.put(HUMIDITY, humidityValue);
             r.put(LIGHT, lightValue);
+            r.put(SOUND, soundValue);
+            r.put(COLOR_R, colorRValue);
+            r.put(COLOR_G, colorGValue);
+            r.put(COLOR_B, colorBValue);
         } catch (JSONException e) {
 			e.printStackTrace();
 		}
