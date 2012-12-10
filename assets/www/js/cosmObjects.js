@@ -22,7 +22,8 @@
     COLOR_B: "colorB",
     MAGNETIC_FIELD_X: "magneticFieldX",
     MAGNETIC_FIELD_Y: "magneticFieldY",
-    MAGNETIC_FIELD_Z: "magneticFieldZ"
+    MAGNETIC_FIELD_Z: "magneticFieldZ",
+    SOUND_ANDROID: "soundAndroid"
   };
 
   this.Sensocamera.CosmObjects.Feed = {
@@ -71,6 +72,8 @@
         id: window.Sensocamera.Sensors.MAGNETIC_FIELD_Y
       }, {
         id: window.Sensocamera.Sensors.MAGNETIC_FIELD_Z
+      }, {
+        id: window.Sensocamera.Sensors.SOUND_ANDROID
       }
     ]
   };

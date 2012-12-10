@@ -56,5 +56,6 @@
     <plugin name="TestPlugin" value="ru.Mathrioshka.Sensocamera.TestPlugin"/>
     <plugin name="ADKBridge" value="ru.Mathrioshka.Sensocamera.ADKBridge"/>
     <plugin name="MagneticField" value="ru.Mathrioshka.Sensocamera.MagneticField"/>
+    <plugin name="SoundLevel" value="ru.Mathrioshka.Sensocamera.SoundLevel"/>
 </plugins>
 </cordova>

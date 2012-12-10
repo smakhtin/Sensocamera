@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorsTable, datapointsRecorded, datapointsRecordedField, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, sensorsSynced, setDatapointsRecorded, setupAccelerometer, setupArduino, setupCompass, setupLocation, setupManeticField, setupRecordCounter, updatePeriod;
+    var checkSensorsTable, datapointsRecorded, datapointsRecordedField, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, sensorsSynced, setDatapointsRecorded, setupAccelerometer, setupAndroidSoundLevel, setupArduino, setupCompass, setupLocation, setupManeticField, setupRecordCounter, updatePeriod;
 
     sensors = [];
 
@@ -104,13 +104,26 @@
       magneticFieldZElement = $("#magneticFieldZ")[0];
       magneticField = new window.Sensocamera.ExternalSensor("MagneticField");
       return magneticField.watchData(function(success) {
-        console.log("Result: " + success);
         if (success === null || success === void 0) {
           return;
         }
         magneticFieldXElement.innerHTML = sensorValues.magneticFieldX = success.x;
         magneticFieldYElement.innerHTML = sensorValues.magneticFieldY = success.y;
         return magneticFieldZElement.innerHTML = sensorValues.magneticFieldZ = success.z;
+      }, function(error) {
+        return error;
+      }, updatePeriod);
+    };
+
+    setupAndroidSoundLevel = function() {
+      var soundLevel, soundLevelAndroidElement;
+      soundLevelAndroidElement = $("#soundAndroid")[0];
+      soundLevel = new window.Sensocamera.ExternalSensor("SoundLevel");
+      return soundLevel.watchData(function(success) {
+        if (success === null || success === void 0) {
+          return;
+        }
+        return soundLevelAndroidElement.innerHTML = sensorValues.soundAndroid = success.value;
       }, function(error) {
         return error;
       }, updatePeriod);
@@ -236,6 +249,7 @@
       setupLocation();
       setupRecordCounter();
       setupManeticField();
+      setupAndroidSoundLevel();
       setTimeout(recordValues, recordPeriod);
       console.log("SensorManager Initialized");
     }

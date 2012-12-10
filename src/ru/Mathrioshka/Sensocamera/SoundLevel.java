@@ -1,10 +1,6 @@
 package ru.Mathrioshka.Sensocamera;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaInterface;
@@ -14,7 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MagneticField extends CordovaPlugin implements SensorEventListener{
+import java.io.IOException;
+import java.util.Timer;
+
+public class SoundLevel extends CordovaPlugin{
     public static final String ACTION_START = "start";
     private static final String ACTION_STOP = "stop";
 
@@ -23,41 +22,34 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
     public static final int STATE_RUNNING = 2;
     public static final int STATE_FAILED = 3;
 
-    private float xValue = 0;
-    private float yValue = 0;
-    private float zValue = 0;
-
-    private SensorManager sensorManager;
+    private double soundLevel = 0;
 
     private CallbackContext callbackContext;
 
     private int currentState = STATE_STOPPED;
-    private int accuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
-    public MagneticField()
-    {
+    private MediaRecorder mediaRecorder;
+
+    Timer timer = new Timer();
+    GetAudioLevelTask getAudioLevelTask = new GetAudioLevelTask(this);
+
+    public SoundLevel() {
 
     }
-
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        sensorManager = (SensorManager) cordova.getActivity().getSystemService(Context.SENSOR_SERVICE);
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals(ACTION_START)){
+        if(action.equals(ACTION_START)) {
             this.callbackContext = callbackContext;
-            if(currentState != STATE_RUNNING){
-                start();
-            }
+            start();
         }
         else if(action.equals(ACTION_STOP)) {
-            if(currentState == STATE_RUNNING) {
-                stop();
-            }
+            stop();
         }
         else {
             return false;
@@ -84,6 +76,7 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
         if(currentState != STATE_RUNNING) setState(STATE_STARTING);
     }
 
+
     private void stop() {
         setState(STATE_STOPPED);
     }
@@ -95,20 +88,31 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
     private void setState(int state, Object data) {
         if(currentState == state) return;
 
-        currentState = state;
+        currentState= state;
 
         switch (currentState){
             case STATE_STOPPED:
-                sensorManager.unregisterListener(this);
-                accuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
+                mediaRecorder.stop();
+                mediaRecorder.release();
+                mediaRecorder = null;
+
+                timer.cancel();
+                timer.purge();
                 break;
             case STATE_STARTING:
                 try {
-                    Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-                    sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-                }
-                catch (NullPointerException e) {
-                    setState(STATE_FAILED, "Can't find Magnetic Field sensor");
+                    mediaRecorder = new MediaRecorder();
+                    mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                    mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                    mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                    mediaRecorder.setOutputFile("/dev/null");
+                    mediaRecorder.prepare();
+                    mediaRecorder.start();
+
+                    timer.schedule(getAudioLevelTask, 0, 1000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    setState(STATE_FAILED);
                 }
                 break;
             case STATE_FAILED:
@@ -117,42 +121,22 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
         }
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() != Sensor.TYPE_MAGNETIC_FIELD) return;
-        if(currentState == STATE_STOPPED) return;
-
-        setState(STATE_RUNNING);
-
-        if(accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
-            xValue = event.values[0];
-            yValue = event.values[1];
-            zValue = event.values[2];
-
-            win();
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        if(sensor.getType() != Sensor.TYPE_MAGNETIC_FIELD) return;
-        if(currentState == STATE_STOPPED) return;
-
-        this.accuracy = accuracy;
+    public void getAmplitude() {
+        soundLevel = mediaRecorder.getMaxAmplitude()/2700.0;
+        win();
     }
 
     private void win() {
+        if(currentState == STATE_STARTING) setState(STATE_RUNNING);
         PluginResult result = new PluginResult(PluginResult.Status.OK, getMagneticFieldJSON());
         result.setKeepCallback(true);
         callbackContext.sendPluginResult(result);
     }
 
-    private void fail(int code, String message)
-    {
-        // Error object
+    private void fail(int currentState, String message) {
         JSONObject errorObj = new JSONObject();
         try {
-            errorObj.put("code", code);
+            errorObj.put("code", currentState);
             errorObj.put("message", message);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -165,9 +149,7 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
     private JSONObject getMagneticFieldJSON() {
         JSONObject r = new JSONObject();
         try {
-            r.put("x", xValue);
-            r.put("y", yValue);
-            r.put("z", zValue);
+            r.put("value", soundLevel);
         } catch (JSONException e) {
             e.printStackTrace();
         }

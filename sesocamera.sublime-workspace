@@ -4,6 +4,74 @@
 		"selected_items":
 		[
 			[
+				"sens",
+				"sensors"
+			],
+			[
+				"setS",
+				"setSensors"
+			],
+			[
+				"sen",
+				"sensors"
+			],
+			[
+				"se",
+				"sensors"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"suc",
+				"success"
+			],
+			[
+				"set",
+				"setupManeticField"
+			],
+			[
+				"MA",
+				"MAGNETIC_FIELD_Z"
+			],
+			[
+				"ma",
+				"magneticFieldZ"
+			],
+			[
+				"sensor",
+				"sensorValues"
+			],
+			[
+				"manetic",
+				"magneticFieldSensor"
+			],
+			[
+				"COLOR",
+				"COLOR_B"
+			],
+			[
+				"COLO",
+				"COLOR_R"
+			],
+			[
+				"color",
+				"colorB"
+			],
+			[
+				"in",
+				"innerHTML"
+			],
+			[
+				"sound",
+				"sound"
+			],
+			[
+				"lo",
+				"long"
+			],
+			[
 				"u",
 				"update"
 			],
@@ -14,36 +82,16 @@
 			[
 				"lis",
 				"listeningElement"
-			],
-			[
-				"re",
-				"receivedEvent"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "assets/www/js/sensorManager.js",
-			"settings":
-			{
-				"buffer_size": 9397,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "assets/www/js/controller.coffee",
-			"settings":
-			{
-				"buffer_size": 3565,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "assets/www/index.html",
 			"settings":
 			{
-				"buffer_size": 5554,
+				"buffer_size": 6213,
 				"line_ending": "Windows"
 			}
 		}
@@ -51,23 +99,31 @@
 	"build_system": "Packages/CoffeeScript/CoffeeScript.sublime-build",
 	"command_palette":
 	{
-		"height": 173.0,
+		"height": 392.0,
 		"selected_items":
 		[
 			[
-				"set s ja",
-				"Set Syntax: JavaScript"
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"set sy hlsl",
+				"Set Syntax: High Level SL"
+			],
+			[
+				"set s hl",
+				"Set Syntax: High Level SL"
 			],
 			[
 				"insta",
 				"Package Control: Install Package"
 			],
 			[
-				"list",
-				"Package Control: List Packages"
+				"set s ja",
+				"Set Syntax: JavaScript"
 			]
 		],
-		"width": 400.0
+		"width": 440.0
 	},
 	"console":
 	{
@@ -84,12 +140,25 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/sensorManager.coffee",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/cosmObjects.coffee",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/testPlugin.coffee",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/main.js",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/adkBridge.js",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/adkBridge.coffee",
+		"/C/Users/Smakhtin/Documents/GitRepos/ParticlesGPU-Modular/Constant_ParticlesGPU.fx",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/index.html",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/maneticField.coffee",
+		"/C/Users/Smakhtin/Dropbox/Programming/AccelerometerExample.java",
+		"/C/Users/Smakhtin/Documents/GitRepos/ParticlesGPU-Modular/Constant_ParticlesGPU_Sprite.fx",
+		"/C/Users/Smakhtin/Dropbox/Mathrioshka Project/SensoCamera/Software/Accelerometer Helper/README.txt",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/controller.coffee",
+		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/sensorManager.js",
 		"/C/Users/Smakhtin/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/index.coffee",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/index.bcp",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/.gitignore",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/index.js",
-		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/index.html",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/assets/www/js/Main.coffee",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/Cakefile",
 		"/C/Users/Smakhtin/Documents/GitRepos/Sensocamera/test.coffee",
@@ -106,7 +175,7 @@
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -120,6 +189,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"External",
+			"@name",
+			"magneticFieldSensor"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -137,254 +209,23 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "assets/www/js/sensorManager.js",
-					"settings":
-					{
-						"buffer_size": 9397,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6308,
-								6308
-							]
-						],
-						"settings":
-						{
-							"annotations":
-							[
-								"TODO",
-								"README",
-								"FIXME"
-							],
-							"csslint_options":
-							{
-								"adjoining-classes": "warning",
-								"box-model": true,
-								"box-sizing": "warning",
-								"compatible-vendor-prefixes": "warning",
-								"display-property-grouping": true,
-								"duplicate-background-images": "warning",
-								"duplicate-properties": true,
-								"empty-rules": true,
-								"errors": true,
-								"fallback-colors": "warning",
-								"floats": "warning",
-								"font-faces": "warning",
-								"font-sizes": "warning",
-								"gradients": "warning",
-								"ids": "warning",
-								"import": "warning",
-								"important": "warning",
-								"known-properties": true,
-								"outline-none": "warning",
-								"overqualified-elements": "warning",
-								"qualified-headings": "warning",
-								"regex-selectors": "warning",
-								"rules-count": "warning",
-								"shorthand": "warning",
-								"star-property-hack": "warning",
-								"text-indent": "warning",
-								"underscore-property-hack": "warning",
-								"unique-headings": "warning",
-								"universal-selector": "warning",
-								"vendor-prefix": true,
-								"zero-units": "warning"
-							},
-							"gjslint_ignore":
-							[
-								110
-							],
-							"gjslint_options":
-							[
-							],
-							"javascript_linter": "jshint",
-							"jshint_options":
-							{
-								"browser": true,
-								"evil": true,
-								"regexdash": true,
-								"sub": true,
-								"trailing": true,
-								"wsh": true
-							},
-							"pep8": true,
-							"pep8_ignore":
-							[
-								"E501"
-							],
-							"perl_linter": "perlcritic",
-							"pyflakes_ignore":
-							[
-							],
-							"pyflakes_ignore_import_*": true,
-							"sublimelinter": true,
-							"sublimelinter_delay": 2,
-							"sublimelinter_disable":
-							[
-							],
-							"sublimelinter_executable_map":
-							{
-							},
-							"sublimelinter_fill_outlines": false,
-							"sublimelinter_gutter_marks": false,
-							"sublimelinter_mark_style": "outline",
-							"sublimelinter_notes": false,
-							"sublimelinter_objj_check_ascii": false,
-							"sublimelinter_popup_errors_on_save": false,
-							"sublimelinter_syntax_map":
-							{
-								"C++": "c",
-								"Python Django": "python",
-								"Ruby on Rails": "ruby"
-							},
-							"sublimelinter_wrap_find": true,
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "assets/www/js/controller.coffee",
-					"settings":
-					{
-						"buffer_size": 3565,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								765,
-								765
-							]
-						],
-						"settings":
-						{
-							"annotations":
-							[
-								"TODO",
-								"README",
-								"FIXME"
-							],
-							"csslint_options":
-							{
-								"adjoining-classes": "warning",
-								"box-model": true,
-								"box-sizing": "warning",
-								"compatible-vendor-prefixes": "warning",
-								"display-property-grouping": true,
-								"duplicate-background-images": "warning",
-								"duplicate-properties": true,
-								"empty-rules": true,
-								"errors": true,
-								"fallback-colors": "warning",
-								"floats": "warning",
-								"font-faces": "warning",
-								"font-sizes": "warning",
-								"gradients": "warning",
-								"ids": "warning",
-								"import": "warning",
-								"important": "warning",
-								"known-properties": true,
-								"outline-none": "warning",
-								"overqualified-elements": "warning",
-								"qualified-headings": "warning",
-								"regex-selectors": "warning",
-								"rules-count": "warning",
-								"shorthand": "warning",
-								"star-property-hack": "warning",
-								"text-indent": "warning",
-								"underscore-property-hack": "warning",
-								"unique-headings": "warning",
-								"universal-selector": "warning",
-								"vendor-prefix": true,
-								"zero-units": "warning"
-							},
-							"gjslint_ignore":
-							[
-								110
-							],
-							"gjslint_options":
-							[
-							],
-							"javascript_linter": "jshint",
-							"jshint_options":
-							{
-								"browser": true,
-								"evil": true,
-								"regexdash": true,
-								"sub": true,
-								"trailing": true,
-								"wsh": true
-							},
-							"pep8": true,
-							"pep8_ignore":
-							[
-								"E501"
-							],
-							"perl_linter": "perlcritic",
-							"pyflakes_ignore":
-							[
-							],
-							"pyflakes_ignore_import_*": true,
-							"sublimelinter": true,
-							"sublimelinter_delay": 2,
-							"sublimelinter_disable":
-							[
-							],
-							"sublimelinter_executable_map":
-							{
-							},
-							"sublimelinter_fill_outlines": false,
-							"sublimelinter_gutter_marks": false,
-							"sublimelinter_mark_style": "outline",
-							"sublimelinter_notes": false,
-							"sublimelinter_objj_check_ascii": false,
-							"sublimelinter_popup_errors_on_save": false,
-							"sublimelinter_syntax_map":
-							{
-								"C++": "c",
-								"Python Django": "python",
-								"Ruby on Rails": "ruby"
-							},
-							"sublimelinter_wrap_find": true,
-							"syntax": "Packages/CoffeeScript/CoffeeScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "assets/www/index.html",
 					"settings":
 					{
-						"buffer_size": 5554,
+						"buffer_size": 6213,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5086,
-								5086
+								679,
+								679
 							]
 						],
 						"settings":
@@ -481,16 +322,11 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1170.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				}
-			]
-		},
-		{
-			"sheets":
-			[
 			]
 		}
 	],
@@ -511,18 +347,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.609597924773,
 			1.0
 		],
 		"rows":
@@ -534,7 +363,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 100.0
+		"height": 172.0
 	},
 	"replace":
 	{
@@ -549,6 +378,18 @@
 			[
 				"index",
 				"assets/www/index.html"
+			],
+			[
+				"adk",
+				"assets/www/js/adkBridge.js"
+			],
+			[
+				"sens",
+				"assets/www/js/sensorManager.coffee"
+			],
+			[
+				"cosm",
+				"assets/www/js/cosmObjects.coffee"
 			],
 			[
 				"contro",

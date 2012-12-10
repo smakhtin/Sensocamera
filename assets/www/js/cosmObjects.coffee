@@ -26,6 +26,8 @@
   MAGNETIC_FIELD_Y: "magneticFieldY"
   MAGNETIC_FIELD_Z: "magneticFieldZ"
 
+  SOUND_ANDROID: "soundAndroid"
+
 @Sensocamera.CosmObjects.Feed = 
   title: "Sensocamera Stream"
   website: "http://mathrioshka.ru/sensocamera"
@@ -90,5 +92,8 @@
     },
     {
       id: window.Sensocamera.Sensors.MAGNETIC_FIELD_Z
+    },
+    {
+      id: window.Sensocamera.Sensors.SOUND_ANDROID
     }
   ]

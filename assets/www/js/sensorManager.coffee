@@ -92,12 +92,25 @@ class @Sensocamera.SensorManager
 		magneticField = new window.Sensocamera.ExternalSensor("MagneticField")
 		magneticField.watchData(
 			(success)-> 
-				console.log "Result: " + success
 				if success is null or success is undefined then return
 
 				magneticFieldXElement.innerHTML = sensorValues.magneticFieldX = success.x;
 				magneticFieldYElement.innerHTML = sensorValues.magneticFieldY = success.y;
 				magneticFieldZElement.innerHTML = sensorValues.magneticFieldZ = success.z;
+		, (error)->
+			error
+		, updatePeriod)
+
+	setupAndroidSoundLevel = () ->
+		soundLevelAndroidElement = $("#soundAndroid")[0]
+
+		soundLevel = new window.Sensocamera.ExternalSensor("SoundLevel")
+
+		soundLevel.watchData(
+			(success)-> 
+				if success is null or success is undefined then return
+
+				soundLevelAndroidElement.innerHTML = sensorValues.soundAndroid = success.value;
 		, (error)->
 			error
 		, updatePeriod)
@@ -212,6 +225,8 @@ class @Sensocamera.SensorManager
 		setupRecordCounter()
 
 		setupManeticField()
+
+		setupAndroidSoundLevel()
 
 		setTimeout(recordValues, recordPeriod)
 
