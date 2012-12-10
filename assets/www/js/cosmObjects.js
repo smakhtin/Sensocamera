@@ -16,7 +16,13 @@
     COMPASS: "compass",
     LOCATION_LAT: "locationLat",
     LOCATION_LONG: "locationLong",
-    LOCATION_ALT: "locationAlt"
+    LOCATION_ALT: "locationAlt",
+    COLOR_R: "colorR",
+    COLOR_G: "colorG",
+    COLOR_B: "colorB",
+    MAGNETIC_FIELD_X: "magneticFieldX",
+    MAGNETIC_FIELD_Y: "magneticFieldY",
+    MAGNETIC_FIELD_Z: "magneticFieldZ"
   };
 
   this.Sensocamera.CosmObjects.Feed = {
@@ -53,6 +59,18 @@
         id: window.Sensocamera.Sensors.LOCATION_LONG
       }, {
         id: window.Sensocamera.Sensors.LOCATION_ALT
+      }, {
+        id: window.Sensocamera.Sensors.COLOR_R
+      }, {
+        id: window.Sensocamera.Sensors.COLOR_G
+      }, {
+        id: window.Sensocamera.Sensors.COLOR_B
+      }, {
+        id: window.Sensocamera.Sensors.MAGNETIC_FIELD_X
+      }, {
+        id: window.Sensocamera.Sensors.MAGNETIC_FIELD_Y
+      }, {
+        id: window.Sensocamera.Sensors.MAGNETIC_FIELD_Z
       }
     ]
   };

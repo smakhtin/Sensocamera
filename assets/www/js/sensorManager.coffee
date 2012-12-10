@@ -83,13 +83,16 @@ class @Sensocamera.SensorManager
 			, {frequency:updatePeriod})
 
 	setupManeticField = () ->
+		console.log "Starting MagneticField Sensor"
+
 		magneticFieldXElement = $("#magneticFieldX")[0];
 		magneticFieldYElement = $("#magneticFieldY")[0];
 		magneticFieldZElement = $("#magneticFieldZ")[0];
 
-		magneticField = new window.Sensocamera.ExternalSensor "MagneticField"
+		magneticField = new window.Sensocamera.ExternalSensor("MagneticField")
 		magneticField.watchData(
 			(success)-> 
+				console.log "Result: " + success
 				if success is null or success is undefined then return
 
 				magneticFieldXElement.innerHTML = sensorValues.magneticFieldX = success.x;
@@ -111,7 +114,7 @@ class @Sensocamera.SensorManager
 		colorGElement = $('#colorG')[0];
 		colorBElement = $('#colorB')[0];
 
-		adk = new window.Sensocamera.ExternalSensor "ADKBridge"
+		adk = new window.Sensocamera.ExternalSensor("ADKBridge")
 		adk.watchData(
 			(success)-> 
 				if success is null or success is undefined then return
@@ -207,6 +210,8 @@ class @Sensocamera.SensorManager
 		setupLocation()
 		
 		setupRecordCounter()
+
+		setupManeticField()
 
 		setTimeout(recordValues, recordPeriod)
 

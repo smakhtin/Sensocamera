@@ -7,49 +7,59 @@ class @Sensocamera.ExternalSensor
 	STATE_RUNNING =  2
 	STATE_FAILED = 3
 
-	currentState = STATE_STOPPED
+	currentState: STATE_STOPPED
 
-	refreshPeriod = 0
-	intervalAction = null
+	refreshPeriod: 0
+	intervalAction: null
 
-	sensors = null;
+	sensors: null
 
-	sensorName = ""
+	constructor: (@sensorName)->
+		@setState(STATE_STARTING)
 
-	constructor: (name)->
-		sensorName = name
-		setState(STATE_STARTING)
-
-	watchData: (success, error, period)->
-		setState(STATE_STARTING)
-		refreshPeriod = period
-		intervalAction = setInterval (() -> success(sensors)), refreshPeriod
-
-	callNativeFunction = (action, params) ->
-		cordova.exec(
-			(success)->
-				if currentState is STATE_STARTING
-					setState(STATE_RUNNING)
-				console.log success
-				sensors = success
-			,(error)->
-				if currentState is STATE_STARTING
-					setState STATE_FAILED
-					console.log error
-			, sensorName, action, params
+	watchData: (success, error, period)=>
+		@setState(STATE_STARTING)
+		@refreshPeriod = period
+		@intervalAction = setInterval( 
+			() => 
+				success(@sensors)
+			, @refreshPeriod
 		)
 
-	setState = (state) ->
-		if currentState is state then return
+	setSensors: (data)=>
+		@sensors = data
 
-		currentState = state;
+	testVis: =>
+		console.log "LALALALA"
 
-		switch currentState
+	callNativeFunction: (action, params) =>
+		console.log "Calling class " + @sensorName
+		cordova.exec(
+			(success)=>
+				if @currentState is STATE_STARTING
+					@setState(STATE_RUNNING)
+				#ExternalSensor::setSensors success
+				@sensors = success
+				#console.log "Sensors " + @sensors
+			,(error)->
+				if @currentState is STATE_STARTING
+					@setState STATE_FAILED
+					console.log "NAME: " + sensorName
+					console.log "EXEC ERROR"
+					console.log error
+			, @sensorName, action, params
+		)
+
+	setState: (state) =>
+		if @currentState is state then return
+
+		@currentState = state;
+
+		switch @currentState
 			when STATE_STOPPED
-				callNativeFunction(STOP_ACTION, [])
+				@callNativeFunction(STOP_ACTION, [])
 				clearInterval(intervalAction)
 			when STATE_STARTING
-				console.log "Starting #{sensorName}"
-				callNativeFunction(START_ACTION, [])
+				@callNativeFunction(START_ACTION, [])
 			when STATE_FAILED
-				console.log "#{sensorName} failded to start"
+				console.log "Failed"

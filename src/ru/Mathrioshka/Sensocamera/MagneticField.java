@@ -34,6 +34,11 @@ public class MagneticField extends CordovaPlugin implements SensorEventListener{
     private int currentState = STATE_STOPPED;
     private int accuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
 
+    public MagneticField()
+    {
+
+    }
+
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {

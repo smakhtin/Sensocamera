@@ -2,7 +2,7 @@
 (function() {
 
   this.Sensocamera.SensorManager = (function() {
-    var checkSensorsTable, datapointsRecorded, datapointsRecordedField, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, sensorsSynced, setDatapointsRecorded, setupAccelerometer, setupArduino, setupCompass, setupLocation, setupRecordCounter, updatePeriod;
+    var checkSensorsTable, datapointsRecorded, datapointsRecordedField, db, maxSyncAttemptsCount, pushData, record, recordPeriod, recordValues, sensorEnum, sensorValues, sensors, sensorsSynced, setDatapointsRecorded, setupAccelerometer, setupArduino, setupCompass, setupLocation, setupManeticField, setupRecordCounter, updatePeriod;
 
     sensors = [];
 
@@ -96,16 +96,39 @@
       });
     };
 
+    setupManeticField = function() {
+      var magneticField, magneticFieldXElement, magneticFieldYElement, magneticFieldZElement;
+      console.log("Starting MagneticField Sensor");
+      magneticFieldXElement = $("#magneticFieldX")[0];
+      magneticFieldYElement = $("#magneticFieldY")[0];
+      magneticFieldZElement = $("#magneticFieldZ")[0];
+      magneticField = new window.Sensocamera.ExternalSensor("MagneticField");
+      return magneticField.watchData(function(success) {
+        console.log("Result: " + success);
+        if (success === null || success === void 0) {
+          return;
+        }
+        magneticFieldXElement.innerHTML = sensorValues.magneticFieldX = success.x;
+        magneticFieldYElement.innerHTML = sensorValues.magneticFieldY = success.y;
+        return magneticFieldZElement.innerHTML = sensorValues.magneticFieldZ = success.z;
+      }, function(error) {
+        return error;
+      }, updatePeriod);
+    };
+
     setupArduino = function() {
-      var adk, gasElement, humidityElement, lightElement, pressureElement, soundElement, temperatureElement;
+      var adk, colorBElement, colorGElement, colorRElement, gasElement, humidityElement, lightElement, pressureElement, soundElement, temperatureElement;
       gasElement = $("#gas")[0];
       temperatureElement = $("#temperature")[0];
       pressureElement = $("#pressure")[0];
       humidityElement = $("#humidity")[0];
       lightElement = $("#light")[0];
       soundElement = $("#sound")[0];
-      adk = new window.Sensocamera.ADKBridge();
-      return adk.watchAcceleration(function(success) {
+      colorRElement = $('#colorR')[0];
+      colorGElement = $('#colorG')[0];
+      colorBElement = $('#colorB')[0];
+      adk = new window.Sensocamera.ExternalSensor("ADKBridge");
+      return adk.watchData(function(success) {
         var sound;
         if (success === null || success === void 0) {
           return;
@@ -119,12 +142,18 @@
         if (sound !== void 0 && sound !== null) {
           sensorValues.sound = success.sound;
         }
+        sensorValues.colorR = success.colorR;
+        sensorValues.colorG = success.colorG;
+        sensorValues.colorB = success.colorB;
         gasElement.innerHTML = success.gas;
         temperatureElement.innerHTML = success.temperature;
         pressureElement.innerHTML = success.pressure;
         humidityElement.innerHTML = success.humidity;
         lightElement.innerHTML = success.light;
-        return soundElement.innerHTML = success.sound;
+        soundElement.innerHTML = success.sound;
+        colorRElement.innerHTML = success.colorR;
+        colorGElement.innerHTML = success.colorG;
+        return colorBElement.innerHTML = success.colorB;
       }, function(error) {
         return error;
       }, updatePeriod);
@@ -206,6 +235,7 @@
       setupCompass();
       setupLocation();
       setupRecordCounter();
+      setupManeticField();
       setTimeout(recordValues, recordPeriod);
       console.log("SensorManager Initialized");
     }
